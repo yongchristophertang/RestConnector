@@ -1,0 +1,10 @@
+{
+	"api":"addFile",
+	"httpUrl":"${http.service.url}",
+	"method":"POST",
+	"subpath":"/api",
+	"parameters":{
+		"method":"pan.file.add",
+		"varParameters":["uid", "fromApp", "fileName", "folderType", "relatedResId", "relatedResType"]
+	}
+}

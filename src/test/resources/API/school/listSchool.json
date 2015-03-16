@@ -1,0 +1,16 @@
+{
+  "api": "listSchool",
+  "url": "${http.service.url}",
+  "method": "GET",
+  "subpath": "/api",
+  "parameters": {
+    "method": "core.area.school.list",
+    "varParameters": [
+      "areaId",
+      "schoolName",
+      "withAllChildren",
+      "skip",
+      "limit"
+    ]
+  }
+}

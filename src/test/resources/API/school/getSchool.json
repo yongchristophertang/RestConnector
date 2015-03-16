@@ -1,0 +1,12 @@
+{
+  "api": "getSchool",
+  "url": "${http.service.url}",
+  "method": "GET",
+  "subpath": "/api",
+  "parameters": {
+    "method": "core.area.school.get",
+    "varParameters": [
+      "id"
+    ]
+  }
+}

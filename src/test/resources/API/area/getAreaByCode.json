@@ -1,0 +1,10 @@
+{
+  "api":"getAreaByCode",
+  "url":"${http.service.url}",
+  "method":"GET",
+  "subpath":"/api",
+  "parameters":{
+    "method":"core.area.code.get",
+    "varParameters":["areaCode"]
+  }
+}

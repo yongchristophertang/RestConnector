@@ -1,0 +1,11 @@
+{
+	"api":"activeUser",
+	"url":"${http.service.url}",
+	"method":"GET",
+	"subpath":"/api",
+	"parameters":{
+		"method":"core.user.active",
+		"varParameters":["uid",
+			 "action"]
+	}
+}

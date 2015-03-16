@@ -1,0 +1,11 @@
+{
+	"api":"validateUser",
+	"url":"${http.service.url}",
+	"method":"GET",
+	"subpath":"/api",
+	"parameters":{
+		"method":"core.user.validate",
+		"varParameters":["key",
+			 "value", "password"]
+	}
+}

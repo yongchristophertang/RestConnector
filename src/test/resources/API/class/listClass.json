@@ -1,0 +1,14 @@
+{
+  "api": "listClass",
+  "url": "${http.service.url}",
+  "method": "GET",
+  "subpath": "/api",
+  "parameters": {
+    "method": "core.class.list",
+    "varParameters": [
+      "uid",
+      "page",
+      "limit"
+    ]
+  }
+}

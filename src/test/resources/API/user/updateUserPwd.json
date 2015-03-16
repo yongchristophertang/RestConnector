@@ -1,0 +1,11 @@
+{
+	"api":"updateUserPwd",
+	"url":"${http.service.url}",
+	"method":"GET",
+	"subpath":"/api",
+	"parameters":{
+		"method":"core.user.pwd.update",
+		"varParameters":["key",
+			 "value","oldPassword","newPassword"]
+	}
+}

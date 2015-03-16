@@ -1,0 +1,10 @@
+{
+  "api":"listCity",
+  "url":"${http.service.url}",
+  "method":"GET",
+  "subpath":"/api",
+  "parameters":{
+    "method":"core.area.city.list",
+    "varParameters":["skip", "limit", "id"]
+  }
+}

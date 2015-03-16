@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration strict="true" packages="com.github.connector.log4j">
+	<Appenders>
+		<Console name="STDOUT">
+			<PatternLayout>
+				<pattern>%p %d [%t] %c:%L >> %m %n%throwable</pattern>
+			</PatternLayout>
+		</Console>
+
+		<TestNGAppender name="app">
+		</TestNGAppender>
+ 
+	</Appenders>
+
+	<Loggers>
+		<logger name="com.github.connector" level="info" additivity="false">
+			<AppenderRef ref="app" />
+			<AppenderRef ref="STDOUT" />
+		</logger>
+
+		<Root level="info">
+			<AppenderRef ref="STDOUT" />
+		</Root>
+	</Loggers>
+
+</Configuration>

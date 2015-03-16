@@ -1,0 +1,13 @@
+{
+  "api":"batchListClass",
+  "url": "${http.service.url}",
+  "method":"GET",
+  "subpath": "/api",
+  "parameters": {
+    "method": "core.class.batch.list",
+    "varParameters": [
+      "classIds",
+      "queryDB"
+    ]
+  }
+}

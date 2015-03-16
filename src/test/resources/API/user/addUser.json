@@ -1,0 +1,12 @@
+{
+	"api":"addUser",
+	"url":"${http.service.url}",
+	"method":"GET",
+	"subpath":"/api",
+	"parameters":{
+		"method":"core.user.add",
+		"varParameters":["roleName",
+			 "schoolId", "loginName", "email", "mobile","userPassword",
+			 "userName", "gender"]
+	}
+}

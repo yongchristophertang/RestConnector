@@ -1,0 +1,10 @@
+{
+  "api":"getArea",
+  "url":"${http.service.url}",
+  "method":"GET",
+  "subpath":"/api",
+  "parameters":{
+    "method":"core.area.get",
+    "varParameters":["id"]
+  }
+}

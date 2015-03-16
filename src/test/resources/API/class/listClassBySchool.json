@@ -1,0 +1,16 @@
+{
+  "api": "listClassBySchool",
+  "url": "${http.service.url}",
+  "method": "GET",
+  "subpath": "/api",
+  "parameters": {
+    "method": "core.class.list.by_school",
+    "varParameters": [
+      "schoolId",
+      "year",
+      "phase",
+      "className",
+      "vertifyStatus"
+    ]
+  }
+}

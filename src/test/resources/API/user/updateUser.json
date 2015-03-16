@@ -1,0 +1,11 @@
+{
+	"api":"updateUser",
+	"url":"${http.service.url}",
+	"method":"GET",
+	"subpath":"/api",
+	"parameters":{
+		"method":"core.user.update",
+		"varParameters":[
+			 "schoolId", "loginName","email","userName", "needRetCode"]
+	}
+}

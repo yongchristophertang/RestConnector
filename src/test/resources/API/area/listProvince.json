@@ -1,0 +1,10 @@
+{
+	"api":"listProvince",
+	"url":"${http.service.url}",
+	"method":"GET",
+	"subpath":"/api",
+	"parameters":{
+		"method":"core.area.province.list",
+		"varParameters":["skip", "limit", "id"]
+	}
+}

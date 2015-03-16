@@ -1,0 +1,11 @@
+{
+	"api":"loginUser",
+	"url":"${http.service.url}",
+	"method":"GET",
+	"subpath":"/api",
+	"parameters":{
+		"method":"core.user.login",
+		"varParameters":["value",
+			 "password"]
+	}
+}
