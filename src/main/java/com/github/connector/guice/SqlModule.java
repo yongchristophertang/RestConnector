@@ -33,19 +33,8 @@ import java.util.Optional;
  * @since 0.4
  */
 public class SqlModule extends AbstractModule {
-    private static Map<SqlDB, HikariDataSource> sqlDbs = new HashMap<>();
     private static final Map<HikariDataSource, JdbcTemplate> store = new HashMap<>();
-
-    private final SqlDB[] sqlDBs;
-
-    /**
-     * Instantiated by {@link com.github.connector.testng.TestNGModuleFactory}.
-     *
-     * @param sqlDBs Manually injected by {@link com.github.connector.testng.TestNGModuleFactory}.
-     */
-    public SqlModule(SqlDB[] sqlDBs) {
-        this.sqlDBs = sqlDBs;
-    }
+    private static Map<SqlDB, HikariDataSource> sqlDbs = new HashMap<>();
 
     /**
      * Configures a {@link com.google.inject.Binder} via the exposed methods.
@@ -57,7 +46,6 @@ public class SqlModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(DataSourceFactory.class).to(DataSourceFactoryImpl.class);
-        bind(SqlDB.class).toProvider(new SqlDbProvider(sqlDBs));
     }
 
     /**

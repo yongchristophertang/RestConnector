@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.connector</groupId>
@@ -8,8 +8,6 @@
 
     <properties>
         <file.encoding>UTF-8</file.encoding>
-        <spring.version>4.1.2.RELEASE</spring.version>
-        <usercenter.version>3.4.2.1027-SNAPSHOT</usercenter.version>
     </properties>
 
     <repositories>
@@ -20,7 +18,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
+            <version>4.1.2.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+            <version>1.5.0.RELEASE</version>
         </dependency>
         <!-- spring db Lib end -->
 

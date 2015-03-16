@@ -16,8 +16,9 @@
 
 package com.github.connector.testng;
 
+import com.github.connector.annotations.Mongo;
 import com.github.connector.annotations.SqlDB;
-import com.github.connector.guice.SqlModule;
+import com.github.connector.guice.DbModule;
 import com.google.inject.Module;
 import org.apache.commons.lang.ArrayUtils;
 import org.testng.IModuleFactory;
@@ -43,7 +44,7 @@ public class TestNGModuleFactory implements IModuleFactory {
      */
     @Override
     public Module createModule(ITestContext context, Class<?> testClass) {
-        return new SqlModule(getAnnotations(null, testClass, SqlDB.class));
+        return new DbModule.DbModuleBuilder().mongo(getAnnotations(null, testClass, Mongo.class)).sql(getAnnotations(null, testClass, SqlDB.class)).build();
     }
 
     /*
@@ -54,8 +55,7 @@ public class TestNGModuleFactory implements IModuleFactory {
         if (testClass == Object.class) {
             return annos;
         } else {
-           return (A[]) ArrayUtils.addAll(annos,
-                    getAnnotations(testClass.getAnnotationsByType(annoClass), testClass.getSuperclass(), annoClass));
+            return getAnnotations((A[]) ArrayUtils.addAll(annos, testClass.getAnnotationsByType(annoClass)), testClass.getSuperclass(), annoClass);
         }
     }
 }

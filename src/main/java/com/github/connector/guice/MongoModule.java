@@ -19,13 +19,12 @@ package com.github.connector.guice;
 import com.google.inject.AbstractModule;
 
 /**
- * Created by YongTang on 2015/3/16.
+ * Guice Module to provide {@link org.springframework.data.mongodb.core.MongoTemplate}.
  *
  * @author Yong Tang
  * @since 0.4
  */
 public class MongoModule extends AbstractModule {
-
 
     /**
      * Configures a {@link com.google.inject.Binder} via the exposed methods.

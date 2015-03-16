@@ -20,6 +20,7 @@ import com.github.connector.annotations.SqlDB;
 import com.github.connector.test.AssertUtils;
 import com.google.inject.Provider;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -35,12 +36,9 @@ public class SqlDbProvider implements Provider<SqlDB> {
 
     public SqlDbProvider(SqlDB[] dbs) {
         AssertUtils.notNull(dbs, "SqlDB array must not be null.");
-        AssertUtils.arrayNotEmpty(dbs, "SqlDB array must not be empty.");
 
         sqlDBs = new LinkedList<>();
-        for (SqlDB db : dbs) {
-            sqlDBs.add(db);
-        }
+        Collections.addAll(sqlDBs, dbs);
     }
 
     /**
