@@ -47,3 +47,4 @@ iTestConnector.iml
 .idea
 target
 *.log
+*.iml
