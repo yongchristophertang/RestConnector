@@ -14,12 +14,12 @@
  *  limitations under the License.
  */
 
-package com.github.connector.annotations;
+package com.github.connector.test.web.annotations;
 
 import java.lang.annotation.*;
 
 /**
- * Mongo DB configuration annotated with this interface
+ * Identifies the host that the annotated class will start requests for.
  *
  * @author Yong Tang
  * @since 0.4
@@ -27,35 +27,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Repeatable(Mongos.class)
-public @interface Mongo {
+public @interface Host {
     /**
-     * The config file location for Mongo connection, this value can overwrite the subsequent parameters.
+     * Http host and port.
      */
-    String config() default "";
-
-    /**
-     * Mongo DB host.
-     */
-    String host() default "";
-
-    /**
-     * Mongo DB port.
-     */
-    int port() default 27017;
-
-    /**
-     * Mongo DB database name
-     */
-    String database() default "";
-
-    /**
-     * Mongo DB user
-     */
-    String user() default "";
-
-    /**
-     * Mongo DB password
-     */
-    String password() default "";
+    String value() default "";
 }

@@ -21,6 +21,7 @@ package com.github.connector.test.web.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.connector.test.web.HttpResult;
 import com.github.connector.test.web.ResultHandler;
+import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,8 +51,8 @@ public class PrintResultHandler implements ResultHandler {
         logger.info("Request URI: " + result.getHttpRequest().getRequestLine());
         logger.info("Cost Time(ms): " + result.getCostTime());
         logger.info("Response Status: " + result.getHttpResponse().getStatusLine());
-        logger.info("Response Header: " + result.getHttpResponse().getAllHeaders());
-        logger.info("Response Content: " + getPrettyJsonPrint(result.getResponseStringContent()));
+        logger.info("Response Header: " + Lists.newArrayList(result.getHttpResponse().getAllHeaders()));
+        logger.info("Response Content: \n" + getPrettyJsonPrint(result.getResponseStringContent()) + "\n");
     }
 
     /**

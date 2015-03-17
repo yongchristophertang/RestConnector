@@ -53,8 +53,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
     @Override
     public HikariDataSource toDataSource() {
         if (StringUtils.isBlank(config)) {
-            if (StringUtils.isBlank(user) && StringUtils.isBlank(url) && StringUtils.isBlank(password)) {
-                throw new IllegalArgumentException("All configurations of SqlDB are blank.");
+            if (StringUtils.isBlank(user) || StringUtils.isBlank(url) || StringUtils.isBlank(password)) {
+                throw new IllegalArgumentException("Not all necessary configuration are specified.");
             }
         } else {
             Properties prop = new Properties();

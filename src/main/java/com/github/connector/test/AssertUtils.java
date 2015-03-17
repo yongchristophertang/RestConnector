@@ -18,6 +18,8 @@
 
 package com.github.connector.test;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -63,6 +65,15 @@ public abstract class AssertUtils {
      */
     public static <K, V> void mapNotEmpty(Map<K, V> map, String message) {
         if (map.isEmpty()) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    /**
+     * Assert a string is not null or blank.
+     */
+    public static void stringNotBlank(String s, String message) {
+        if (StringUtils.isBlank(s)) {
             throw new IllegalArgumentException(message);
         }
     }

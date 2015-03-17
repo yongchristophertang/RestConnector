@@ -14,48 +14,19 @@
  *  limitations under the License.
  */
 
-package com.github.connector.annotations;
+package com.github.connector.test.web.annotations;
 
 import java.lang.annotation.*;
 
 /**
- * Mongo DB configuration annotated with this interface
+ * Indicates that the annotated method responds to HTTP DELETE requests.
  *
  * @author Yong Tang
  * @since 0.4
  */
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@HttpMethod(HttpMethod.DELETE)
 @Documented
-@Repeatable(Mongos.class)
-public @interface Mongo {
-    /**
-     * The config file location for Mongo connection, this value can overwrite the subsequent parameters.
-     */
-    String config() default "";
-
-    /**
-     * Mongo DB host.
-     */
-    String host() default "";
-
-    /**
-     * Mongo DB port.
-     */
-    int port() default 27017;
-
-    /**
-     * Mongo DB database name
-     */
-    String database() default "";
-
-    /**
-     * Mongo DB user
-     */
-    String user() default "";
-
-    /**
-     * Mongo DB password
-     */
-    String password() default "";
+public @interface DELETE {
 }

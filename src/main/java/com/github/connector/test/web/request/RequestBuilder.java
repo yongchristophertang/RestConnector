@@ -23,7 +23,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.net.URISyntaxException;
 
 /**
- * Created by YongTang on 2015/3/9.
+ * Factory interface to build {@link org.apache.http.client.methods.HttpUriRequest}.
  *
  * @author Yong Tang
  * @since 0.4

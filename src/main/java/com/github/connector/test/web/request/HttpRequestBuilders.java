@@ -16,9 +16,11 @@
 
 package com.github.connector.test.web.request;
 
+import com.github.connector.test.web.http.BodyFormBuilder;
 import org.apache.http.Header;
-import org.apache.http.HttpRequest;
+import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.cookie.Cookie;
@@ -33,7 +35,7 @@ import static com.github.connector.test.AssertUtils.arrayNotEmpty;
 /**
  * Default builder for {@link HttpRequestBase} required as input to
  * perform request in {@link com.github.connector.test.web.WebTemplate}.
- * <p>
+ * <p/>
  * <p>Application tests will typically access this builder through the static
  * factory methods in {@link com.github.connector.test.web.request.TestRequestBuilders}.
  *
@@ -49,6 +51,7 @@ public class HttpRequestBuilders implements RequestBuilder {
     private final List<RequestPostProcessor> postProcessors = new ArrayList<>();
     private HttpRequestBase httpRequest;
     private String uriTemplate;
+    private HttpEntity httpEntity;
     private String contentType;
     private byte[] content;
     private Locale locale;
@@ -57,7 +60,7 @@ public class HttpRequestBuilders implements RequestBuilder {
     /**
      * Package private constructor. To get an instance, use static factory
      * methods in {@link com.github.connector.test.web.request.TestRequestBuilders}.
-     * <p>
+     * <p/>
      * <p>Although this class cannot be extended, additional ways to initialize
      * the {@code MockHttpServletRequest} can be plugged in via
      * {@link #with(RequestPostProcessor)}.
@@ -75,13 +78,21 @@ public class HttpRequestBuilders implements RequestBuilder {
         this.uriTemplate = urlTemplate;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public HttpRequestBase buildRequest() throws URISyntaxException {
         URIBuilder builder = new URIBuilder(uriTemplate);
         builder.addParameters(parameters);
-        httpRequest.setHeaders((Header[]) headers.toArray());
+        Header[] heads = new Header[headers.size()];
+        httpRequest.setHeaders(headers.toArray(heads));
         httpRequest.setURI(builder.build());
         postProcessors.stream().forEach(p -> httpRequest = p.postProcessRequest(httpRequest));
+
+        if (httpEntity != null) {
+            ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(httpEntity);
+        }
         return httpRequest;
     }
 
@@ -103,7 +114,6 @@ public class HttpRequestBuilders implements RequestBuilder {
      *
      * @param name  replacement expression
      * @param value replacement value
-     * @return
      */
     public HttpRequestBuilders path(String name, String value) {
         Objects.requireNonNull(name, "path expression must not be null");
@@ -157,6 +167,16 @@ public class HttpRequestBuilders implements RequestBuilder {
      */
     public HttpRequestBuilders body(byte[] content) {
         this.content = content;
+        return this;
+    }
+
+    /**
+     * Set the multipart body
+     *
+     * @param bodyFormBuilder factory builder for {@link com.github.connector.test.web.http.BodyForm}
+     */
+    public HttpRequestBuilders body(BodyFormBuilder bodyFormBuilder) {
+        this.httpEntity = bodyFormBuilder.buildBody().getHttpEntity();
         return this;
     }
 

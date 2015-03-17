@@ -75,6 +75,14 @@
         </dependency>
         <!-- http client end -->
 
+        <!-- RESTEasy client begins
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <version>3.0.10.Final</version>
+        </dependency>
+         RESTEasy client ends -->
+
         <!-- utilities lib start -->
         <dependency>
             <groupId>com.google.guava</groupId>

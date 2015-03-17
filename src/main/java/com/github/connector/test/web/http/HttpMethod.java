@@ -16,11 +16,7 @@
 
 package com.github.connector.test.web.http;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestFactory;
-import org.apache.http.MethodNotSupportedException;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.impl.DefaultHttpRequestFactory;
+import org.apache.http.client.methods.*;
 
 /**
  * Enumeration of supported Http request methods
@@ -30,10 +26,20 @@ import org.apache.http.impl.DefaultHttpRequestFactory;
  */
 public enum HttpMethod {
 
-    GET, POST, PUT, DELETE, OPTION, HEAD, PATCH, TRACE;
+    GET(new HttpGet()), POST(new HttpPost()), PUT(new HttpPut()), DELETE(new HttpDelete()), OPTIONS(new HttpOptions()),
+    HEAD(new HttpHead()), PATCH(new HttpPatch()), TRACE(new HttpTrace());
 
-    public HttpRequestBase getHttpRequest() throws MethodNotSupportedException {
-        HttpRequestFactory factory = new DefaultHttpRequestFactory();
-        return (HttpRequestBase) factory.newHttpRequest(this.name(), "");
+    private HttpRequestBase requestBase;
+
+    private HttpMethod(HttpRequestBase request) {
+        this.requestBase = request;
+    }
+
+    public HttpRequestBase getHttpRequest() {
+        try {
+            return (HttpRequestBase) requestBase.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
     }
 }

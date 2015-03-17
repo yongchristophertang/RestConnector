@@ -17,9 +17,19 @@
 package com.github.connector.test.web.request;
 
 
+import com.github.connector.test.web.annotations.*;
+import com.github.connector.test.web.http.BodyFormBuilder;
 import com.github.connector.test.web.http.HttpMethod;
-import org.apache.http.MethodNotSupportedException;
 import org.apache.http.client.methods.*;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Proxy;
+
+import static com.github.connector.test.AssertUtils.notNull;
+import static com.github.connector.test.AssertUtils.stringNotBlank;
 
 /**
  * Static factory methods for {@link HttpRequestBuilders}s.
@@ -83,32 +93,82 @@ public abstract class TestRequestBuilders {
     }
 
     /**
-     * Create a {@link HttpRequestBuilders} for a request with the given HTTP method except for PATCH.
+     * Create a {@link HttpRequestBuilders} for a request with the given HTTP method.
      *
      * @param httpMethod   the HTTP method except for PATCH
      * @param urlTemplate  a URL template; the resulting URL will be encoded
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders request(HttpMethod httpMethod, String urlTemplate, Object... urlVariables) {
-        try {
-            return new HttpRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, urlVariables);
-        } catch (MethodNotSupportedException e) {
-            e.printStackTrace();
-            // Except for PATCH method, this exception will never be invoked
-            return null;
-        }
+        return new HttpRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, urlVariables);
     }
 
     /**
-     * Create a {@link com.github.connector.test.web.request.HttpRequestBuilders} for a request with a predefined API.
+     * Create a {@link com.github.connector.test.web.request.HttpMultipartRequestBuilders} for a request with the
+     * given HTTP method.
      *
-     * @param apiName the predefined API name
-     * @param urlVars zero or more URL variables
+     * @param httpMethod   the HTTP method except for PATCH
+     * @param urlTemplate  a URL template; the resulting URL will be encoded
+     * @param urlVariables zero or more URL variables
      */
-    public static HttpRequestBuilders api(String apiName, Object... urlVars) {
+    public static HttpMultipartRequestBuilders multipartRequest(HttpMethod httpMethod, String urlTemplate,
+            Object... urlVariables) {
+        return new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, urlVariables);
+    }
 
-        // TODO: Give implementation
-        return null;
+    @SuppressWarnings("unchecked")
+    public static <T> T api(Class<T> clientIface) {
+        return (T) Proxy.newProxyInstance(TestRequestBuilders.class.getClassLoader(), new Class<?>[]{clientIface},
+                new ApiProxy());
+    }
+
+    private static class ApiProxy implements InvocationHandler {
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            Host host = method.getDeclaringClass().getAnnotation(Host.class);
+            notNull(host, "Http Host must not be null.");
+            stringNotBlank(host.value(), "Http Host must not be blank.");
+
+            String url = host.value();
+            Path path = method.getDeclaringClass().getAnnotation(Path.class);
+            if (path != null) {
+                url += path.value();
+            }
+
+            path = method.getAnnotation(Path.class);
+            if (path != null) {
+                url += path.value();
+            }
+
+            com.github.connector.test.web.annotations.HttpMethod httpMethod = null;
+            for (Annotation annotation : method.getAnnotations()) {
+                httpMethod = annotation.annotationType().getAnnotation(
+                        com.github.connector.test.web.annotations.HttpMethod.class);
+            }
+            notNull(httpMethod, "Http method must not be null.");
+
+
+            HttpMethod hm = HttpMethod.valueOf(httpMethod.value());
+            HttpRequestBuilders builders = TestRequestBuilders.request(hm, url);
+
+            Parameter[] parameters = method.getParameters();
+            for (int i = 0; i < parameters.length; i++) {
+                Parameter p = parameters[i];
+                if (p.isAnnotationPresent(PathParam.class)) {
+                    builders.path(p.getAnnotation(PathParam.class).value(), args[i].toString());
+                } else if (p.isAnnotationPresent(BodyParam.class)) {
+                    builders.body(BodyFormBuilder.multipart()
+                            .param(p.getAnnotation(BodyParam.class).value(), args[i].toString()));
+                } else if (p.isAnnotationPresent(FileParam.class)) {
+                    builders.body(BodyFormBuilder.multipart()
+                            .file(p.getAnnotation(FileParam.class).value(), args[i].toString()));
+                } else if (p.isAnnotationPresent(QueryParam.class)) {
+                    builders.param(p.getAnnotation(QueryParam.class).value(), args[i].toString());
+                }
+            }
+            return builders;
+        }
     }
 
 }

@@ -26,7 +26,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import java.net.URISyntaxException;
 
 /**
- * Created by YongTang on 2015/3/9.
+ * Multipart builder to build {@link org.apache.http.client.methods.HttpRequestBase}.
  *
  * @author Yong Tang
  * @since 0.4

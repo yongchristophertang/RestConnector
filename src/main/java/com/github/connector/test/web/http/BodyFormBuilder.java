@@ -18,10 +18,12 @@
 
 package com.github.connector.test.web.http;
 
+import com.github.connector.test.AssertUtils;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 import java.io.File;
+import java.util.Optional;
 
 /**
  * Builder to construct a multipart entity
@@ -38,8 +40,6 @@ public class BodyFormBuilder {
 
     /**
      * Static factory method to create a factory of {@link BodyFormBuilder}
-     *
-     * @return
      */
     public static BodyFormBuilder multipart() {
         return new BodyFormBuilder();
@@ -53,7 +53,8 @@ public class BodyFormBuilder {
      * @return {@link com.github.connector.test.web.http.BodyFormBuilder}
      */
     public BodyFormBuilder param(String name, String value) {
-        builder.addTextBody(name, value);
+        AssertUtils.notNull(name, "Parameter name must not be null.");
+        Optional.ofNullable(value).ifPresent(v -> builder.addTextBody(name, v));
         return this;
     }
 
@@ -65,7 +66,8 @@ public class BodyFormBuilder {
      * @return {@link com.github.connector.test.web.http.BodyFormBuilder}
      */
     public BodyFormBuilder file(String name, String filePath) {
-        builder.addBinaryBody(name, new File(filePath));
+        AssertUtils.notNull(name, "File name must not be null.");
+        Optional.ofNullable(filePath).ifPresent(f -> builder.addBinaryBody(name, new File(f)));
         return this;
     }
 
