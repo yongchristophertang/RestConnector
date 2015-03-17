@@ -1,17 +1,17 @@
 /*
  * Copyright 2014-2015 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package com.github.connector.test.web.request;
@@ -112,12 +112,19 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpMultipartRequestBuilders multipartRequest(HttpMethod httpMethod, String urlTemplate,
-            Object... urlVariables) {
+                                                                Object... urlVariables) {
         return new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, urlVariables);
     }
 
+    /**
+     * Create a {@code T} instance which is a proxy for the interface {@code clientIface}. Typically methods in {@code clientIface} will return a {@link com.github.connector.test.web.request.RequestBuilder} or, more concrete, {@link com.github.connector.test.web.request.HttpRequestBuilders}.
+     *
+     * @param clientIface the API method definition interface
+     * @param <T> Inteface class
+     * @return {@code T} instance
+     */
     @SuppressWarnings("unchecked")
-    public static <T> T api(Class<T> clientIface) {
+    public static <T> T api(Class<T> clientIface) throws Exception {
         return (T) Proxy.newProxyInstance(TestRequestBuilders.class.getClassLoader(), new Class<?>[]{clientIface},
                 new ApiProxy());
     }
