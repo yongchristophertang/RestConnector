@@ -14,19 +14,19 @@
  *  limitations under the License.
  */
 
-package com.github.connector.test.web.annotations;
-
-import java.lang.annotation.*;
+package com.github.connector.test.java;
 
 /**
- * Indicates that the annotated method responds to HTTP GET requests.
+ * Created by YongTang on 2015/3/18.
  *
  * @author Yong Tang
  * @since 0.4
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@HTTPMethod(HTTPMethod.GET)
-@Documented
-public @interface GET {
+public class DemoClient implements DemoInterface {
+    @Override
+    public void test() {
+        for (int i = 0; i < 100; i++) {
+            System.out.println("############################################");
+        }
+    }
 }

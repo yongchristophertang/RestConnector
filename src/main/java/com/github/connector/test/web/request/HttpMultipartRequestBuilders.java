@@ -18,8 +18,9 @@
 
 package com.github.connector.test.web.request;
 
-import com.github.connector.test.web.http.BodyFormBuilder;
+import com.github.connector.test.web.http.MultipartBodyFormBuilder;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 
@@ -37,7 +38,7 @@ public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
     /**
      * Package private constructor. To get an instance, use static factory
      * methods in {@link com.github.connector.test.web.request.TestRequestBuilders}.
-     * <p>
+     * <p/>
      * <p>Although this class cannot be extended, additional ways to initialize
      * the {@code MockHttpServletRequest} can be plugged in via
      * {@link #with(RequestPostProcessor)}.
@@ -46,11 +47,14 @@ public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
      * @param urlTemplate  a URL template; the resulting URL will be encoded
      * @param urlVariables zero or more URL variables
      */
-    HttpMultipartRequestBuilders(HttpRequestBase httpRequest, String urlTemplate,
+    HttpMultipartRequestBuilders(HttpRequest httpRequest, String urlTemplate,
             Object... urlVariables) {
         super(httpRequest, urlTemplate, urlVariables);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public HttpRequestBase buildRequest() throws URISyntaxException {
         HttpEntityEnclosingRequestBase requestBase = (HttpEntityEnclosingRequestBase) super.buildRequest();
@@ -61,10 +65,10 @@ public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
     /**
      * Set the multipart body
      *
-     * @param bodyFormBuilder factory builder for {@link com.github.connector.test.web.http.BodyForm}
+     * @param multipartBodyFormBuilder factory builder for {@link com.github.connector.test.web.http.BodyForm}
      */
-    public HttpRequestBuilders body(BodyFormBuilder bodyFormBuilder) {
-        this.httpEntity = bodyFormBuilder.buildBody().getHttpEntity();
+    public HttpRequestBuilders body(MultipartBodyFormBuilder multipartBodyFormBuilder) {
+        this.httpEntity = multipartBodyFormBuilder.buildBody().getHttpEntity();
         return this;
     }
 

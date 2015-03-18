@@ -31,7 +31,7 @@ import java.util.Objects;
  * @author Yong Tang
  * @since 0.4
  */
-public class WebTemplateBuilder {
+public class WebTemplateBuilder implements TemplateBuilder {
     private RequestConfig.Builder builder;
     private List<ResultMatcher> resultMatchers = new ArrayList<>();
     private List<ResultHandler> resultHandlers = new ArrayList<>();
@@ -44,10 +44,21 @@ public class WebTemplateBuilder {
     }
 
     /**
-     * Build a webTemplate with config
+     * Build a webTemplate with custom config
+     *
+     * @return {@link com.github.connector.test.web.WebTemplateBuilder}
      */
-    public static WebTemplateBuilder config() {
+    public static WebTemplateBuilder customConfig() {
         return new WebTemplateBuilder(RequestConfig.custom());
+    }
+
+    /**
+     * Build a {@link com.github.connector.test.web.WebTemplate} with default settings.
+     *
+     * @return {@link com.github.connector.test.web.TemplateBuilder}
+     */
+    public static TemplateBuilder defaultConfig() {
+        return customConfig();
     }
 
     /**
@@ -99,6 +110,7 @@ public class WebTemplateBuilder {
     /**
      * Build a {@link com.github.connector.test.web.WebTemplate} with custom config builder
      */
+    @Override
     public WebTemplate build() {
         WebTemplate webTemplate = new WebTemplate(builder.build());
         webTemplate.setDefaultResultHandlers(resultHandlers);

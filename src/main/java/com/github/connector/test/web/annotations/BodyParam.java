@@ -28,5 +28,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface BodyParam {
-    String value();
+    /**
+     * Body form parameter name.
+     */
+    String value() default "";
 }

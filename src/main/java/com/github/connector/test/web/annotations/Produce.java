@@ -19,14 +19,14 @@ package com.github.connector.test.web.annotations;
 import java.lang.annotation.*;
 
 /**
- * Indicates that the annotated method responds to HTTP GET requests.
+ * Identifies the content-type that the request will produce.
  *
  * @author Yong Tang
  * @since 0.4
  */
-@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HTTPMethod(HTTPMethod.GET)
+@Target(ElementType.METHOD)
 @Documented
-public @interface GET {
+public @interface Produce {
+    String value();
 }

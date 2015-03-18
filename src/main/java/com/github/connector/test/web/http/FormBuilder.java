@@ -14,19 +14,20 @@
  *  limitations under the License.
  */
 
-package com.github.connector.test.web.annotations;
-
-import java.lang.annotation.*;
+package com.github.connector.test.web.http;
 
 /**
- * Indicates that the annotated method responds to HTTP GET requests.
+ * Builder class to build a {@link com.github.connector.test.web.http.BodyForm}.
  *
  * @author Yong Tang
  * @since 0.4
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@HTTPMethod(HTTPMethod.GET)
-@Documented
-public @interface GET {
+public interface FormBuilder {
+
+    /**
+     * Build a {@link com.github.connector.test.web.http.BodyForm} instance
+     *
+     * @return {@link com.github.connector.test.web.http.BodyForm}
+     */
+    public BodyForm buildBody();
 }

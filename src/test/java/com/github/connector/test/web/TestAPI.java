@@ -16,10 +16,8 @@
 
 package com.github.connector.test.web;
 
-import com.github.connector.test.web.annotations.GET;
-import com.github.connector.test.web.annotations.Host;
-import com.github.connector.test.web.annotations.Path;
-import com.github.connector.test.web.annotations.PathParam;
+import com.github.connector.test.web.annotations.*;
+import com.github.connector.test.web.request.HttpRequestBuilders;
 import com.github.connector.test.web.request.RequestBuilder;
 
 /**
@@ -28,11 +26,24 @@ import com.github.connector.test.web.request.RequestBuilder;
  * @author Yong Tang
  * @since 0.4
  */
-@Host("http://172.16.79.22:11391")
+@Host(value = "http://172.16.79.22", port = 11391)
 @Path("/resourceservice/v5/catalogues")
 public interface TestAPI {
+
+    @QueryParam("token")
+    public String token = "accepted";
 
     @Path("/grades/${id}")
     @GET
     public RequestBuilder getBooks(@PathParam("id") String id);
+
+    @Path("/grades/${id}")
+    @GET
+    public HttpRequestBuilders getGrades(@QueryParam("id") String queryId, @PathParam("id") int pathId);
+
+    @Path("/grades")
+    @POST
+    @Produce("text/plain")
+    @Consume("application/json")
+    public RequestBuilder postGrade(@BodyParam String id);
 }

@@ -18,7 +18,7 @@
 
 package com.github.connector.test.web.request;
 
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.HttpRequest;
 
 import java.net.URISyntaxException;
 
@@ -29,5 +29,5 @@ import java.net.URISyntaxException;
  * @since 0.4
  */
 public interface RequestBuilder {
-    public HttpUriRequest buildRequest() throws URISyntaxException;
+    public HttpRequest buildRequest() throws URISyntaxException;
 }

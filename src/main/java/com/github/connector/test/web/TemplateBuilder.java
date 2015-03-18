@@ -14,19 +14,17 @@
  *  limitations under the License.
  */
 
-package com.github.connector.test.web.annotations;
-
-import java.lang.annotation.*;
+package com.github.connector.test.web;
 
 /**
- * Indicates that the annotated method responds to HTTP GET requests.
+ * Builder class to build a {@link com.github.connector.test.web.WebTemplate}.
  *
  * @author Yong Tang
  * @since 0.4
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@HTTPMethod(HTTPMethod.GET)
-@Documented
-public @interface GET {
+public interface TemplateBuilder {
+    /**
+     * Build a {@link com.github.connector.test.web.WebTemplate} with custom config builder
+     */
+    public WebTemplate build();
 }

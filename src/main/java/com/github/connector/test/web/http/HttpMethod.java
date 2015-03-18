@@ -16,6 +16,7 @@
 
 package com.github.connector.test.web.http;
 
+import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.*;
 
 /**
@@ -35,9 +36,9 @@ public enum HttpMethod {
         this.requestBase = request;
     }
 
-    public HttpRequestBase getHttpRequest() {
+    public HttpRequest getHttpRequest() {
         try {
-            return (HttpRequestBase) requestBase.clone();
+            return (HttpRequest) requestBase.clone();
         } catch (CloneNotSupportedException e) {
             return null;
         }

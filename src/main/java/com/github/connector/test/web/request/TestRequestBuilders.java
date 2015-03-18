@@ -17,19 +17,10 @@
 package com.github.connector.test.web.request;
 
 
-import com.github.connector.test.web.annotations.*;
-import com.github.connector.test.web.http.BodyFormBuilder;
 import com.github.connector.test.web.http.HttpMethod;
 import org.apache.http.client.methods.*;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
-
-import static com.github.connector.test.AssertUtils.notNull;
-import static com.github.connector.test.AssertUtils.stringNotBlank;
 
 /**
  * Static factory methods for {@link HttpRequestBuilders}s.
@@ -59,7 +50,7 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders post(String urlTemplate, Object... urlVariables) {
-        return new HttpMultipartRequestBuilders(new HttpPost(), urlTemplate, urlVariables);
+        return new HttpRequestBuilders(new HttpPost(), urlTemplate, urlVariables);
     }
 
     /**
@@ -69,7 +60,7 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders put(String urlTemplate, Object... urlVariables) {
-        return new HttpMultipartRequestBuilders(new HttpPut(), urlTemplate, urlVariables);
+        return new HttpRequestBuilders(new HttpPut(), urlTemplate, urlVariables);
     }
 
     /**
@@ -89,13 +80,13 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders patch(String urlTemplate, Object... urlVariables) {
-        return new HttpMultipartRequestBuilders(new HttpPatch(), urlTemplate, urlVariables);
+        return new HttpRequestBuilders(new HttpPatch(), urlTemplate, urlVariables);
     }
 
     /**
      * Create a {@link HttpRequestBuilders} for a request with the given HTTP method.
      *
-     * @param httpMethod   the HTTP method except for PATCH
+     * @param httpMethod   the HTTP method
      * @param urlTemplate  a URL template; the resulting URL will be encoded
      * @param urlVariables zero or more URL variables
      */
@@ -107,75 +98,27 @@ public abstract class TestRequestBuilders {
      * Create a {@link com.github.connector.test.web.request.HttpMultipartRequestBuilders} for a request with the
      * given HTTP method.
      *
-     * @param httpMethod   the HTTP method except for PATCH
+     * @param httpMethod   the HTTP method
      * @param urlTemplate  a URL template; the resulting URL will be encoded
      * @param urlVariables zero or more URL variables
      */
     public static HttpMultipartRequestBuilders multipartRequest(HttpMethod httpMethod, String urlTemplate,
-                                                                Object... urlVariables) {
+            Object... urlVariables) {
         return new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, urlVariables);
     }
 
     /**
-     * Create a {@code T} instance which is a proxy for the interface {@code clientIface}. Typically methods in {@code clientIface} will return a {@link com.github.connector.test.web.request.RequestBuilder} or, more concrete, {@link com.github.connector.test.web.request.HttpRequestBuilders}.
+     * Create a {@code T} instance which is a proxy for the interface {@code clientIface}. Typically methods in
+     * {@code clientIface} will return a {@link com.github.connector.test.web.request.RequestBuilder} or, more
+     * concrete, {@link com.github.connector.test.web.request.HttpRequestBuilders}.
      *
      * @param clientIface the API method definition interface
-     * @param <T> Inteface class
+     * @param <T>         Inteface class
      * @return {@code T} instance
      */
     @SuppressWarnings("unchecked")
     public static <T> T api(Class<T> clientIface) throws Exception {
         return (T) Proxy.newProxyInstance(TestRequestBuilders.class.getClassLoader(), new Class<?>[]{clientIface},
-                new ApiProxy());
+                RequestProxy.getInstance());
     }
-
-    private static class ApiProxy implements InvocationHandler {
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            Host host = method.getDeclaringClass().getAnnotation(Host.class);
-            notNull(host, "Http Host must not be null.");
-            stringNotBlank(host.value(), "Http Host must not be blank.");
-
-            String url = host.value();
-            Path path = method.getDeclaringClass().getAnnotation(Path.class);
-            if (path != null) {
-                url += path.value();
-            }
-
-            path = method.getAnnotation(Path.class);
-            if (path != null) {
-                url += path.value();
-            }
-
-            com.github.connector.test.web.annotations.HttpMethod httpMethod = null;
-            for (Annotation annotation : method.getAnnotations()) {
-                httpMethod = annotation.annotationType().getAnnotation(
-                        com.github.connector.test.web.annotations.HttpMethod.class);
-            }
-            notNull(httpMethod, "Http method must not be null.");
-
-
-            HttpMethod hm = HttpMethod.valueOf(httpMethod.value());
-            HttpRequestBuilders builders = TestRequestBuilders.request(hm, url);
-
-            Parameter[] parameters = method.getParameters();
-            for (int i = 0; i < parameters.length; i++) {
-                Parameter p = parameters[i];
-                if (p.isAnnotationPresent(PathParam.class)) {
-                    builders.path(p.getAnnotation(PathParam.class).value(), args[i].toString());
-                } else if (p.isAnnotationPresent(BodyParam.class)) {
-                    builders.body(BodyFormBuilder.multipart()
-                            .param(p.getAnnotation(BodyParam.class).value(), args[i].toString()));
-                } else if (p.isAnnotationPresent(FileParam.class)) {
-                    builders.body(BodyFormBuilder.multipart()
-                            .file(p.getAnnotation(FileParam.class).value(), args[i].toString()));
-                } else if (p.isAnnotationPresent(QueryParam.class)) {
-                    builders.param(p.getAnnotation(QueryParam.class).value(), args[i].toString());
-                }
-            }
-            return builders;
-        }
-    }
-
 }

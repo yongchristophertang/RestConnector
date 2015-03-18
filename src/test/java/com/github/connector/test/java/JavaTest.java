@@ -14,19 +14,21 @@
  *  limitations under the License.
  */
 
-package com.github.connector.test.web.annotations;
+package com.github.connector.test.java;
 
-import java.lang.annotation.*;
+import org.junit.Test;
 
 /**
- * Indicates that the annotated method responds to HTTP GET requests.
+ * Created by YongTang on 2015/3/18.
  *
  * @author Yong Tang
  * @since 0.4
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@HTTPMethod(HTTPMethod.GET)
-@Documented
-public @interface GET {
+public class JavaTest {
+
+    @Test
+    public void testDemo() {
+        DemoInterface di = ProxyClient.newClient(new DemoClient()).getProxyForInterface(DemoInterface.class);
+        di.test();
+    }
 }

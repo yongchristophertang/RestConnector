@@ -24,9 +24,12 @@ import java.lang.annotation.*;
  * @author Yong Tang
  * @since 0.4
  */
-@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface FileParam {
+    /**
+     * File parameter name.
+     */
     String value();
 }

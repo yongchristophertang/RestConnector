@@ -24,9 +24,9 @@ import java.lang.annotation.*;
  * @author Yong Tang
  * @since 0.4
  */
-@Target({ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HttpMethod(HttpMethod.DELETE)
+@HTTPMethod(HTTPMethod.DELETE)
 @Documented
 public @interface DELETE {
 }

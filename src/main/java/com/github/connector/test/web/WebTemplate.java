@@ -33,9 +33,9 @@ import java.util.List;
 
 /**
  * <strong>Main entry point for Http test support.</strong>
- * <p>
+ * <p/>
  * <p>Below is an example:
- * <p>
+ * <p/>
  * <pre>
  * static imports:
  * MockMvcBuilders.*, MockMvcRequestBuilders.*, MockMvcResultMatchers.*
@@ -66,7 +66,7 @@ public final class WebTemplate {
     }
 
     public ResultActions perform(RequestBuilder builder) throws Exception {
-        HttpUriRequest httpRequest = builder.buildRequest();
+        HttpUriRequest httpRequest = (HttpUriRequest) builder.buildRequest();
 
         long before = System.currentTimeMillis();
         HttpResponse httpResponse = httpClient.execute(httpRequest);

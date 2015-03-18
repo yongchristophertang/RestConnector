@@ -14,16 +14,19 @@
  *  limitations under the License.
  */
 
-package com.github.connector.test.web.request;
+package com.github.connector.test.web.annotations;
 
+import java.lang.annotation.*;
 
 /**
- * Created by YongTang on 2015/3/17.
+ * Identifies the Accept header that the client will consume
  *
  * @author Yong Tang
  * @since 0.4
  */
-public class ApiRequestBuilderMapper {
-
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Documented
+public @interface Consume {
+    String value();
 }

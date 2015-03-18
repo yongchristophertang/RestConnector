@@ -17,10 +17,8 @@
 package com.github.connector.testng.guice.test;
 
 import com.github.connector.annotations.SqlDB;
-import com.github.connector.testng.TestNGModuleFactory;
 import com.google.inject.Inject;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 /**
@@ -30,10 +28,13 @@ import org.testng.annotations.Test;
  * @since 0.4
  */
 @Test
-@SqlDB(url = "111", userName = "222", password = "333")
+@SqlDB( config = "/config/db1.properties")
 public class GuiceTest2 extends AbstractGuiceTest {
     @Inject
     private JdbcTemplate jdbcTemplate;
+
+    @Inject
+    private JdbcTemplate jdbcTemplate2;
 
     @Test
     private void testDemo() {

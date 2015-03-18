@@ -27,5 +27,8 @@ import java.lang.annotation.*;
 @Documented
 public @interface PathParam {
 
+    /**
+     * Path parameter name
+     */
     String value();
 }

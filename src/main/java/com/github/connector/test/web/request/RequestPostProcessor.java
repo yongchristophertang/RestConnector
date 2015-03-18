@@ -16,14 +16,14 @@
 
 package com.github.connector.test.web.request;
 
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.HttpRequest;
 
 /**
  * Extension point for applications or 3rd party libraries that wish to further
  * initialize a {@link org.apache.http.client.methods.HttpRequestBase} instance after it has been built
  * by {@link com.github.connector.test.web.request.HttpRequestBuilders} or its subclass {@link com.github.connector
  * .test.web.request.HttpMultipartRequestBuilders}.
- * <p>
+ * <p/>
  * <p>Implementations of this interface can be provided to
  * {@link com.github.connector.test.web.request.HttpRequestBuilders#with(RequestPostProcessor)} at the time
  * when a request is about to be performed.
@@ -41,7 +41,7 @@ public interface RequestPostProcessor {
      * @param request the request to initialize
      * @return the request to use, either the one passed in or a wrapped one;
      */
-    HttpRequestBase postProcessRequest(HttpRequestBase request);
+    HttpRequest postProcessRequest(HttpRequest request);
 
 
 }

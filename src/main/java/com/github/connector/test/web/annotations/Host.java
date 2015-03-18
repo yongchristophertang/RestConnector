@@ -41,5 +41,5 @@ public @interface Host {
     /**
      * Http host config location, has a lower priority than above two attributes.
      */
-    String location();
+    String location() default "";
 }

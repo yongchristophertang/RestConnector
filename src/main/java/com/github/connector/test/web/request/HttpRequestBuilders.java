@@ -16,21 +16,22 @@
 
 package com.github.connector.test.web.request;
 
-import com.github.connector.test.web.http.BodyFormBuilder;
+import com.google.common.collect.Lists;
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequest;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.net.URISyntaxException;
 import java.util.*;
 
-import static com.github.connector.test.AssertUtils.arrayNotEmpty;
+import static com.github.connector.test.AssertUtils.*;
 
 /**
  * Default builder for {@link HttpRequestBase} required as input to
@@ -49,10 +50,8 @@ public class HttpRequestBuilders implements RequestBuilder {
     private final List<Cookie> cookies = new ArrayList<>();
 
     private final List<RequestPostProcessor> postProcessors = new ArrayList<>();
-    private HttpRequestBase httpRequest;
+    private HttpRequest httpRequest;
     private String uriTemplate;
-    private HttpEntity httpEntity;
-    private String contentType;
     private byte[] content;
     private Locale locale;
     private String characterEncoding;
@@ -68,7 +67,7 @@ public class HttpRequestBuilders implements RequestBuilder {
      * @param urlTemplate  a URL template; the resulting URL will be encoded
      * @param urlVariables zero or more URL variables
      */
-    HttpRequestBuilders(HttpRequestBase httpRequest, String urlTemplate, Object... urlVariables) {
+    HttpRequestBuilders(HttpRequest httpRequest, String urlTemplate, Object... urlVariables) {
 
         Objects.requireNonNull(urlTemplate, "uriTemplate is required");
         Objects.requireNonNull(httpRequest, "httpRequest is required");
@@ -82,16 +81,15 @@ public class HttpRequestBuilders implements RequestBuilder {
      * {@inheritDoc}
      */
     @Override
-    public HttpRequestBase buildRequest() throws URISyntaxException {
+    public HttpRequest buildRequest() throws URISyntaxException {
         URIBuilder builder = new URIBuilder(uriTemplate);
         builder.addParameters(parameters);
         Header[] heads = new Header[headers.size()];
         httpRequest.setHeaders(headers.toArray(heads));
-        httpRequest.setURI(builder.build());
+        ((HttpRequestBase) httpRequest).setURI(builder.build());
         postProcessors.stream().forEach(p -> httpRequest = p.postProcessRequest(httpRequest));
-
-        if (httpEntity != null) {
-            ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(httpEntity);
+        if (content != null && content.length > 0) {
+            ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new ByteArrayEntity(content));
         }
         return httpRequest;
     }
@@ -143,7 +141,6 @@ public class HttpRequestBuilders implements RequestBuilder {
      */
     public HttpRequestBuilders contentType(String contentType) {
         Objects.requireNonNull(contentType, "contentType must not be null");
-        this.contentType = contentType;
         this.headers.add(new BasicHeader("Content-Type", contentType));
         return this;
     }
@@ -156,7 +153,7 @@ public class HttpRequestBuilders implements RequestBuilder {
     public HttpRequestBuilders accept(String... mediaTypes) {
         arrayNotEmpty(mediaTypes, "mediaTypes must not be null");
         this.headers.add(new BasicHeader("Accept",
-                Arrays.asList(mediaTypes).stream().reduce("", (s1, s2) -> s1 + ";" + s2)));
+                Lists.newArrayList(mediaTypes).stream().reduce((s1, s2) -> (s1 + ";" + s2)).orElse("")));
         return this;
     }
 
@@ -171,12 +168,33 @@ public class HttpRequestBuilders implements RequestBuilder {
     }
 
     /**
-     * Set the multipart body
+     * Set the request body.
      *
-     * @param bodyFormBuilder factory builder for {@link com.github.connector.test.web.http.BodyForm}
+     * @param content the body content
      */
-    public HttpRequestBuilders body(BodyFormBuilder bodyFormBuilder) {
-        this.httpEntity = bodyFormBuilder.buildBody().getHttpEntity();
+    public HttpRequestBuilders body(String content) {
+        return body(content.getBytes());
+    }
+
+    /**
+     * Set the request body form.
+     *
+     * @param param the body form parameter
+     * @param value the body form value
+     */
+    public HttpRequestBuilders body(String param, String value) {
+        notNull(param, "Parameter must not be null");
+        stringNotBlank(value, "Value must not be blank");
+
+        if (content != null && content.length > 0) {
+            content = (new String(content) + "&" + param + "=" + value).getBytes();
+        } else {
+            if (param.equals("")) {
+                return body(value.getBytes());
+            } else {
+                content = (param + "=" + value).getBytes();
+            }
+        }
         return this;
     }
 

@@ -31,5 +31,5 @@ public @interface Path {
     /**
      * URI path
      */
-    String value() default "";
+    String value();
 }

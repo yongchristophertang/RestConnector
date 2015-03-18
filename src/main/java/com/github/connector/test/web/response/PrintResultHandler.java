@@ -22,6 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.connector.test.web.HttpResult;
 import com.github.connector.test.web.ResultHandler;
 import com.google.common.collect.Lists;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.RequestLine;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,10 +51,20 @@ public class PrintResultHandler implements ResultHandler {
      */
     @Override
     public void handle(HttpResult result) throws Exception {
-        logger.info("Request URI: " + result.getHttpRequest().getRequestLine());
+        RequestLine rl = result.getHttpRequest().getRequestLine();
+        logger.info("Request URI: " + rl);
+        if (rl.getMethod().equals("POST") || rl.getMethod().equals("PUT") || rl.getMethod().equals("PATCH")) {
+            if (result.getHttpRequest() instanceof HttpEntityEnclosingRequest) {
+                logger.info("Request Body: " +
+                        EntityUtils.toString(((HttpEntityEnclosingRequest) result.getHttpRequest()).getEntity()));
+            } else {
+                logger.info("Request Body: " + "Multipart Body Cannot Be Displayed.");
+            }
+        }
+        logger.info("Request Headers: " + Lists.newArrayList(result.getHttpRequest().getAllHeaders()));
         logger.info("Cost Time(ms): " + result.getCostTime());
         logger.info("Response Status: " + result.getHttpResponse().getStatusLine());
-        logger.info("Response Header: " + Lists.newArrayList(result.getHttpResponse().getAllHeaders()));
+        logger.info("Response Headers: " + Lists.newArrayList(result.getHttpResponse().getAllHeaders()));
         logger.info("Response Content: \n" + getPrettyJsonPrint(result.getResponseStringContent()) + "\n");
     }
 

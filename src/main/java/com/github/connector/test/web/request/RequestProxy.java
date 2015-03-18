@@ -16,20 +16,24 @@
 
 package com.github.connector.test.web.request;
 
-import com.github.connector.test.web.annotations.Host;
-import com.github.connector.test.web.annotations.Path;
-import com.github.connector.test.web.annotations.QueryParam;
+import com.github.connector.test.web.annotations.*;
+import com.github.connector.test.web.http.HttpMethod;
+import com.github.connector.test.web.http.MultipartBodyFormBuilder;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Properties;
+import java.lang.reflect.Parameter;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.github.connector.test.AssertUtils.notNull;
 
 /**
- * Request proxy singleton, which implements {@link java.lang.reflect.InvocationHandler} to handle forwarded method callings from the proxy class
+ * Request proxy singleton, which implements {@link java.lang.reflect.InvocationHandler} to handle forwarded method
+ * callings from the proxy class
  *
  * @author Yong Tang
  * @since 0.4
@@ -40,22 +44,101 @@ public class RequestProxy implements InvocationHandler {
     private RequestProxy() {
     }
 
+    /**
+     * Get the singleton instance of {@link com.github.connector.test.web.request.RequestProxy}.
+     */
     public static RequestProxy getInstance() {
         return INSTANCE;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Map<String, String> queryParams = new HashMap<>();
+        Map<String, String> bodyParams = new HashMap<>();
+        Map<String, String> pathParams = new HashMap<>();
+        Map<String, String> fileParams = new HashMap<>();
+        String contentType = null;
+        String accept = null;
+
         String url = getHost(method.getDeclaringClass().getAnnotation(Host.class));
-        url += getPath(method.getDeclaringClass().getAnnotation(Path.class));
+        url += getPath(method.getDeclaringClass().getAnnotation(Path.class)) +
+                getPath(method.getAnnotation(Path.class));
 
-        Field[] fields = method.getDeclaringClass().getFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(QueryParam.class)) {
-
+        Lists.newArrayList(method.getDeclaringClass().getFields()).stream().filter(f -> {
+            try {
+                return f.get(null) != null;
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return false;
             }
+        }).forEach(f -> {
+            try {
+                if (f.isAnnotationPresent(PathParam.class)) {
+                    pathParams.put(f.getAnnotation(PathParam.class).value(), f.get(null).toString());
+                } else if (f.isAnnotationPresent(BodyParam.class)) {
+                    bodyParams.put(f.getAnnotation(BodyParam.class).value(), f.get(null).toString());
+                } else if (f.isAnnotationPresent(QueryParam.class)) {
+                    queryParams.put(f.getAnnotation(QueryParam.class).value(), f.get(null).toString());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        Produce produce = method.getAnnotation(Produce.class);
+        if (produce != null) {
+            contentType = produce.value();
         }
-        return null;
+
+        Consume consume = method.getAnnotation(Consume.class);
+        if (consume != null) {
+            accept = consume.value();
+        }
+
+        List<HTTPMethod> httpMethods = Lists.newArrayList(method.getAnnotations()).stream()
+                .map(a -> a.annotationType().getAnnotation(HTTPMethod.class)).filter(m -> m != null).collect(
+                        Collectors.toList());
+        if (httpMethods.size() != 1) {
+            throw new IllegalArgumentException("HTTPMethod annotation must be annotated once, no more and no less");
+        }
+
+        notNull(httpMethods.get(0).value(), "Http Method is not defined");
+        HttpMethod httpMethod = HttpMethod.valueOf(httpMethods.get(0).value());
+
+        Parameter[] parameters = method.getParameters();
+        IntStream.range(0, parameters.length).forEach(i -> {
+            Parameter p = parameters[i];
+            if (p.isAnnotationPresent(PathParam.class)) {
+                pathParams.put(p.getAnnotation(PathParam.class).value(), args[i].toString());
+            } else if (p.isAnnotationPresent(BodyParam.class)) {
+                bodyParams.put(p.getAnnotation(BodyParam.class).value(), args[i].toString());
+            } else if (p.isAnnotationPresent(FileParam.class)) {
+                fileParams.put(p.getAnnotation(FileParam.class).value(), args[i].toString());
+            } else if (p.isAnnotationPresent(QueryParam.class)) {
+                queryParams.put(p.getAnnotation(QueryParam.class).value(), args[i].toString());
+            }
+        });
+
+        if (fileParams.isEmpty()) {
+            HttpRequestBuilders builders = new HttpRequestBuilders(httpMethod.getHttpRequest(), url);
+            pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
+            queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
+            bodyParams.keySet().stream().forEach(key -> builders.body(key, bodyParams.get(key)));
+            Optional.ofNullable(contentType).ifPresent(builders::contentType);
+            Optional.ofNullable(accept).ifPresent(builders::accept);
+            return builders;
+        } else {
+            HttpMultipartRequestBuilders builders = new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), url);
+            pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
+            queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
+            bodyParams.keySet().stream()
+                    .forEach(key -> builders.body(MultipartBodyFormBuilder.create().param(key, bodyParams.get(key))));
+            fileParams.keySet().stream().forEach(key -> builders.body(
+                    MultipartBodyFormBuilder.create().file(key, bodyParams.get(key))));
+            Optional.ofNullable(contentType).ifPresent(builders::contentType);
+            Optional.ofNullable(accept).ifPresent(builders::accept);
+            return builders;
+        }
     }
 
     private String getHost(Host host) throws Exception {

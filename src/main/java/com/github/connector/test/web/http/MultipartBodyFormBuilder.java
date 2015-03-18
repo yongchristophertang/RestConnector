@@ -31,18 +31,15 @@ import java.util.Optional;
  * @author Yong Tang
  * @since 0.4
  */
-public class BodyFormBuilder {
+public class MultipartBodyFormBuilder implements FormBuilder {
     private MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 
-    private BodyFormBuilder() {
+    private MultipartBodyFormBuilder() {
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
     }
 
-    /**
-     * Static factory method to create a factory of {@link BodyFormBuilder}
-     */
-    public static BodyFormBuilder multipart() {
-        return new BodyFormBuilder();
+    public static MultipartBodyFormBuilder create() {
+        return new MultipartBodyFormBuilder();
     }
 
     /**
@@ -50,9 +47,9 @@ public class BodyFormBuilder {
      *
      * @param name  parameter name
      * @param value parameter value
-     * @return {@link com.github.connector.test.web.http.BodyFormBuilder}
+     * @return {@link MultipartBodyFormBuilder}
      */
-    public BodyFormBuilder param(String name, String value) {
+    public MultipartBodyFormBuilder param(String name, String value) {
         AssertUtils.notNull(name, "Parameter name must not be null.");
         Optional.ofNullable(value).ifPresent(v -> builder.addTextBody(name, v));
         return this;
@@ -63,9 +60,9 @@ public class BodyFormBuilder {
      *
      * @param name     attached file name
      * @param filePath local file path
-     * @return {@link com.github.connector.test.web.http.BodyFormBuilder}
+     * @return {@link MultipartBodyFormBuilder}
      */
-    public BodyFormBuilder file(String name, String filePath) {
+    public MultipartBodyFormBuilder file(String name, String filePath) {
         AssertUtils.notNull(name, "File name must not be null.");
         Optional.ofNullable(filePath).ifPresent(f -> builder.addBinaryBody(name, new File(f)));
         return this;
@@ -76,9 +73,9 @@ public class BodyFormBuilder {
      *
      * @param name    content name
      * @param content bytes content
-     * @return {@link com.github.connector.test.web.http.BodyFormBuilder}
+     * @return {@link MultipartBodyFormBuilder}
      */
-    public BodyFormBuilder content(String name, byte[] content) {
+    public MultipartBodyFormBuilder content(String name, byte[] content) {
         builder.addBinaryBody(name, content);
         return this;
     }
@@ -88,6 +85,7 @@ public class BodyFormBuilder {
      *
      * @return {@link com.github.connector.test.web.http.BodyForm}
      */
+    @Override
     public BodyForm buildBody() {
         return builder::build;
     }

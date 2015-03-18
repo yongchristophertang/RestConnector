@@ -21,11 +21,19 @@ package com.github.connector.test.web;
 import java.io.IOException;
 
 /**
- * Created by YongTang on 2015/3/9.
+ * Transform {@link com.github.connector.test.web.HttpResult} to a {@code T} instance.
  *
  * @author Yong Tang
  * @since 0.4
  */
 public interface ResultTransform<T> {
+
+    /**
+     * Transform {@link com.github.connector.test.web.HttpResult} to a {@code T} instance.
+     *
+     * @param httpResult httpResult for a http request
+     * @return {@code T}
+     * @throws IOException
+     */
     T transform(HttpResult httpResult) throws IOException;
 }

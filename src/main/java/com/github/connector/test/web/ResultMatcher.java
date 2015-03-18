@@ -18,16 +18,14 @@
 
 package com.github.connector.test.web;
 
-import org.apache.http.HttpResponse;
-
 /**
  * Matches the result of an executed request against some expectation.
- *
+ * <p/>
  * <p>See static factory methods in
  * {@code org.springframework.test.web.server.result.MockMvcResultMatchers}.
- *
+ * <p/>
  * <p>Example:
- *
+ * <p/>
  * <pre>
  * static imports: MockMvcRequestBuilders.*, MockMvcResultMatchers.*
  *
@@ -40,12 +38,12 @@ import org.apache.http.HttpResponse;
  */
 public interface ResultMatcher {
 
-	/**
-	 * Assert the result of an executed request.
-	 *
-	 * @param result the result of the executed request
-	 * @throws Exception if a failure occurs
-	 */
-	void match(HttpResult result) throws Exception;
+    /**
+     * Assert the result of an executed request.
+     *
+     * @param result the result of the executed request
+     * @throws Exception if a failure occurs
+     */
+    void match(HttpResult result) throws Exception;
 
 }

@@ -29,14 +29,16 @@ import static com.github.connector.test.web.response.HttpResultHandlers.print;
  * @since 0.4
  */
 public class GetTest {
+    private WebTemplate webTemplate;
+
     @Before
     public void setUp() {
-        WebTemplate webTemplate = WebTemplateBuilder.config().build();
+        WebTemplate webTemplate = WebTemplateBuilder.defaultConfig().build();
     }
 
     @Test
     public void testDemo() throws Exception {
-        WebTemplate webTemplate = WebTemplateBuilder.config().build();
-        webTemplate.perform(api(TestAPI.class).getBooks("123")).andDo(print());
+        webTemplate = WebTemplateBuilder.defaultConfig().build();
+        webTemplate.perform(api(TestAPI.class).postGrade("{\"test\":123}")).andDo(print());
     }
 }
