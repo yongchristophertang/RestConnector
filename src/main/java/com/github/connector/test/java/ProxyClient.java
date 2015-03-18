@@ -40,8 +40,9 @@ public class ProxyClient {
      * @throws java.lang.ClassCastException if {@code iface} is not an interface that {@code client} implements.
      */
     @SuppressWarnings("unchecked")
-    public <T> T getProxyForInterface(Class<T> iface) {
-        return JavaRequestProxy.createProxy(iface.cast(client), iface);
+    public <T> T getLoggerProxyForInterface(Class<T> iface) {
+        ProxyFactory<T> factory = new LoggerProxyFactory(client, new Class<?>[]{iface});
+        return factory.buildProxy();
     }
 
     /**
@@ -49,9 +50,9 @@ public class ProxyClient {
      *
      * @return Object to cast to expected valid interface
      */
-    public Object getGenericProxy() {
-        return JavaRequestProxy.createProxy(client, client.getClass().getInterfaces());
-    }
+//    public Object getGenericProxy() {
+//        return JavaRequestProxy.createProxy(client, client.getClass().getInterfaces());
+//    }
 
     /**
      * Get the underlying client on interface {@code iface}
