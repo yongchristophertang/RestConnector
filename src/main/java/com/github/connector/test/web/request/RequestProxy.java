@@ -33,7 +33,9 @@ import static com.github.connector.test.AssertUtils.notNull;
 
 /**
  * Request proxy singleton, which implements {@link java.lang.reflect.InvocationHandler} to handle forwarded method
- * callings from the proxy class
+ * callings from the proxy class.
+ * The class has no mutable states and can be viewed as a pure function, thus making it effectively thread safe.
+ * Singleton pattern will not cause any troubles.
  *
  * @author Yong Tang
  * @since 0.4
@@ -153,12 +155,18 @@ public class RequestProxy implements InvocationHandler {
         } else {
             throw new IllegalArgumentException("Host is not defined");
         }
-
         return url;
     }
 
     private String getPath(Path path) {
         String p = path.value();
-        return p.length() > 0 ? (p.startsWith("/") ? p : "/" + p) : "";
+        return removeTrailingSlash(p.length() > 0 ? (p.startsWith("/") ? p : "/" + p) : "");
+    }
+
+    private String removeTrailingSlash(String path) {
+        if (!path.endsWith("/")) {
+            return path;
+        }
+        return removeTrailingSlash(path.substring(0, path.length() - 1));
     }
 }

@@ -33,6 +33,8 @@ import java.util.Optional;
  * @since 0.4
  */
 public class SqlModule extends AbstractModule {
+    // if used in multi thread environment, here needs to change HashMap to ConcurrentHashMap
+    // TODO: support multi thread in future
     private static final Map<HikariDataSource, JdbcTemplate> store = new HashMap<>();
     private static Map<SqlDB, HikariDataSource> sqlDbs = new HashMap<>();
 
