@@ -17,11 +17,14 @@
 package com.github.connector.test.java;
 
 /**
- * Abstract factory to produce proxies
+ * Factory to build a proxy of Type T
  *
  * @author Yong Tang
  * @since 0.4
  */
 public interface ProxyFactory<T> {
-    T buildProxy();
+    /**
+     * Build a {@code T} proxy.
+     */
+    public T buildProxy();
 }

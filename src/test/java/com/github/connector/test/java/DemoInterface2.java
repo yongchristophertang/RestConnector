@@ -22,16 +22,6 @@ package com.github.connector.test.java;
  * @author Yong Tang
  * @since 0.4
  */
-public class DemoClient implements DemoInterface, DemoInterface2 {
-    @Override
-    public void test() {
-        for (int i = 0; i < 100; i++) {
-            System.out.println("############################################");
-        }
-    }
-
-    @Override
-    public void test2() {
-        System.out.println("???");
-    }
+public interface DemoInterface2 {
+    public void test2();
 }

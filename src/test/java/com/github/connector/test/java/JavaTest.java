@@ -28,7 +28,7 @@ public class JavaTest {
 
     @Test
     public void testDemo() {
-        DemoInterface di = ProxyClient.newClient(new DemoClient()).getLoggerProxyForInterface(DemoInterface.class);
+        DemoInterface di = ProxyFactories.createLoggerProxy(new DemoClient());
         di.test();
     }
 }

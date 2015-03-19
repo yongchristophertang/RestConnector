@@ -17,21 +17,25 @@
 package com.github.connector.test.java;
 
 /**
- * Created by YongTang on 2015/3/18.
+ * Proxy factories to build different kinds of proxies
  *
  * @author Yong Tang
  * @since 0.4
  */
-public class DemoClient implements DemoInterface, DemoInterface2 {
-    @Override
-    public void test() {
-        for (int i = 0; i < 100; i++) {
-            System.out.println("############################################");
-        }
+public class ProxyFactories {
+    /**
+     * Create a logger proxy for {@code client}
+     *
+     * @see {@link com.github.connector.test.java.LoggerProxyFactory}
+     */
+    public static <T> T createLoggerProxy(T client) {
+        return LoggerProxyFactory.newProxyFactory(client).buildProxy();
     }
 
-    @Override
-    public void test2() {
-        System.out.println("???");
+    /**
+     * Create a proxy via a {@link com.github.connector.test.java.ProxyFactory}
+     */
+    public static <T> T createLoggerProxy(ProxyFactory<T> factory) {
+        return factory.buildProxy();
     }
 }
