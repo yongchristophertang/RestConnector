@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package com.github.connector.annotations;
+package com.github.connector.testng;
 
-import java.lang.annotation.*;
+import com.github.connector.annotations.SqlDB;
+import org.testng.annotations.Guice;
 
 /**
- * Indicates annotation with a class can access to APIs that defined in config files located in provided path
+ * Created by YongTang on 2015/3/16.
  *
  * @author Yong Tang
  * @since 0.4
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Documented
-public @interface ApiRepo {
-    /**
-     * API config file locations
-     */
-    String[] values() default "";
+@Guice(moduleFactory = TestNGModuleFactory.class)
+@SqlDB(url = "111", userName = "222", password = "333")
+public abstract class AbstractGuiceTest {
 }

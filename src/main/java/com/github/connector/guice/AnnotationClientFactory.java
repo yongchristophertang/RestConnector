@@ -14,19 +14,33 @@
  * limitations under the License.
  */
 
-package com.github.connector.testng.guice.test;
+package com.github.connector.guice;
 
-import com.github.connector.annotations.SqlDB;
-import com.github.connector.testng.TestNGModuleFactory;
-import org.testng.annotations.Guice;
+import com.google.common.collect.Lists;
+
+import java.util.Queue;
+import java.util.stream.Collectors;
 
 /**
- * Created by YongTang on 2015/3/16.
+ * Created by YongTang on 2015/3/20.
  *
  * @author Yong Tang
  * @since 0.4
  */
-@Guice(moduleFactory = TestNGModuleFactory.class)
-@SqlDB(url = "111", userName = "222", password = "333")
-public abstract class AbstractGuiceTest {
+public abstract class AnnotationClientFactory<T, A> implements ClientFactory<T> {
+    private final A[] annos;
+    private final Queue<T> clients;
+
+    AnnotationClientFactory(A[] annos) {
+        this.annos = annos;
+        clients = Lists.newLinkedList(
+                Lists.newArrayList(annos).stream().map(this::createClient).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Queue<T> buildClients() {
+        return clients;
+    }
+
+    abstract protected T createClient(A anno);
 }

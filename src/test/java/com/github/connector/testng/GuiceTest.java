@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.connector.testng.guice.test;
+package com.github.connector.testng;
 
 import com.github.connector.annotations.SqlDB;
 import com.google.inject.Inject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 /**
@@ -31,6 +32,7 @@ import org.testng.annotations.Test;
 @Test
 @SqlDB(url = "111", userName = "222", password = "333")
 @SqlDB(url = "333", userName = "222", password = "333")
+@Listeners(TestNGListener.class)
 public class GuiceTest extends AbstractGuiceTest {
 //    @Inject
 //    private Provider<JdbcTemplate> jdbcTemplateProvider;
@@ -41,8 +43,6 @@ public class GuiceTest extends AbstractGuiceTest {
     @Inject
     private JdbcTemplate jdbcTemplate2;
 
-    @Inject
-    private JdbcTemplate jdbcTemplate3;
 
     @BeforeClass
     private void setUp() {
@@ -54,7 +54,12 @@ public class GuiceTest extends AbstractGuiceTest {
     private void testDemo() {
         System.out.println(jdbcTemplate);
         System.out.println(jdbcTemplate2);
-        System.out.println(jdbcTemplate3);
+    }
+
+    @Test
+    private void testDemo2() {
+        System.out.println(jdbcTemplate);
+        System.out.println(jdbcTemplate2);
     }
 
 }

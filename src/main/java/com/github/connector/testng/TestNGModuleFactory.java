@@ -18,9 +18,16 @@ package com.github.connector.testng;
 
 import com.github.connector.annotations.Mongo;
 import com.github.connector.annotations.SqlDB;
-import com.github.connector.guice.DbModule;
+import com.github.connector.guice.ClientFactory;
+import com.github.connector.guice.JdbcTemplateFactory;
+import com.github.connector.guice.MongoTemplateFactory;
+import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import org.apache.commons.lang.ArrayUtils;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.testng.IModuleFactory;
 import org.testng.ITestContext;
 
@@ -44,8 +51,32 @@ public class TestNGModuleFactory implements IModuleFactory {
      */
     @Override
     public Module createModule(ITestContext context, Class<?> testClass) {
-        return new DbModule.DbModuleBuilder().mongo(getAnnotations(null, testClass, Mongo.class))
-                .sql(getAnnotations(null, testClass, SqlDB.class)).build();
+        return new AbstractModule() {
+
+            @Override
+            protected void configure() {
+                bind(new TypeLiteral<ClientFactory<MongoTemplate>>() {
+                }).toInstance(
+                        new MongoTemplateFactory(getAnnotations(null, testClass, Mongo.class)));
+                bind(new TypeLiteral<ClientFactory<JdbcTemplate>>() {
+                }).toInstance(
+                        new JdbcTemplateFactory(getAnnotations(null, testClass, SqlDB.class)));
+            }
+
+            @Provides
+            MongoTemplate provideMontoTemplate(ClientFactory<MongoTemplate> factory) {
+                MongoTemplate mongoTemplate = factory.buildClients().poll();
+                factory.buildClients().add(mongoTemplate);
+                return mongoTemplate;
+            }
+
+            @Provides
+            JdbcTemplate provideJdbcTemplate(ClientFactory<JdbcTemplate> factory) {
+                JdbcTemplate jdbcTemplate = factory.buildClients().poll();
+                factory.buildClients().add(jdbcTemplate);
+                return jdbcTemplate;
+            }
+        };
     }
 
     /*

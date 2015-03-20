@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.github.connector.store;
+package com.github.connector.guice;
+
+import java.util.Queue;
 
 /**
- * ApiStore stores all APIs
+ * Created by YongTang on 2015/3/20.
  *
  * @author Yong Tang
  * @since 0.4
  */
-public interface ApiStore<K, T> {
-    /**
-     * Get the API by Key
-     */
-    T getApi(K key);
+public interface ClientFactory<T> {
+    Queue<T> buildClients();
 }

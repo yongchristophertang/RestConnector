@@ -17,7 +17,6 @@
 package com.github.connector.test.web;
 
 import com.github.connector.test.web.annotations.*;
-import com.github.connector.test.web.request.HttpRequestBuilders;
 import com.github.connector.test.web.request.RequestBuilder;
 
 /**
@@ -27,7 +26,7 @@ import com.github.connector.test.web.request.RequestBuilder;
  * @since 0.4
  */
 @Host(value = "http://172.16.79.22", port = 11391)
-@Path("/resourceservice/v5/catalogues")
+@Path("/v5/categories")
 public interface TestAPI {
 
     @QueryParam("token")
@@ -39,11 +38,15 @@ public interface TestAPI {
 
     @Path("/grades/${id}")
     @GET
-    public HttpRequestBuilders getGrades(@QueryParam("id") String queryId, @PathParam("id") int pathId);
+    public RequestBuilder getGrades(@QueryParam("id") String queryId, @PathParam("id") int pathId);
 
     @Path("/grades")
     @POST
     @Produce("text/plain")
     @Consume("application/json")
     public RequestBuilder postGrade(@BodyParam String id);
+
+    @Path("/areas")
+    @GET
+    public RequestBuilder getAreas();
 }

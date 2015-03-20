@@ -17,41 +17,32 @@
 package com.github.connector.guice;
 
 import com.github.connector.annotations.SqlDB;
-import com.github.connector.test.AssertUtils;
-import com.google.inject.Inject;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Factory implementation of {@link com.github.connector.guice.DataSourceFactory}.
+ * Created by YongTang on 2015/3/20.
+ *
+ * @author Yong Tang
+ * @since 0.4
  */
-public class DataSourceFactoryImpl implements DataSourceFactory {
-    private String config;
-    private String user;
-    private String password;
-    private String url;
+public class JdbcTemplateFactory extends AnnotationClientFactory<JdbcTemplate, SqlDB> {
 
-    private SqlDB sqlDB;
-
-    @Inject
-    public DataSourceFactoryImpl(SqlDB sqlDB) {
-        AssertUtils.notNull(sqlDB, "SqlDB must not be null.");
-        this.sqlDB = sqlDB;
-
-        this.config = sqlDB.config();
-        this.url = sqlDB.url();
-        this.user = sqlDB.userName();
-        this.password = sqlDB.password();
+    public JdbcTemplateFactory(SqlDB[] annos) {
+        super(annos);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public HikariDataSource toDataSource() {
+    protected JdbcTemplate createClient(SqlDB anno) {
+        String config = anno.config();
+        String user = anno.userName();
+        String url = anno.url();
+        String password = anno.password();
+
         if (StringUtils.isBlank(config)) {
             if (StringUtils.isBlank(user) || StringUtils.isBlank(url) || StringUtils.isBlank(password)) {
                 throw new IllegalArgumentException("Not all necessary configuration are specified.");
@@ -72,14 +63,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
         ds.setJdbcUrl(url);
         ds.setUsername(user);
         ds.setPassword(password);
-        return ds;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SqlDB getSqlDB() {
-        return sqlDB;
+        return new JdbcTemplate(ds);
     }
 }

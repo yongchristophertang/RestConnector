@@ -17,8 +17,6 @@
 package com.github.connector.guice;
 
 import com.github.connector.annotations.Mongo;
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import com.mongodb.MongoClient;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -28,27 +26,18 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 
 /**
- * Guice Module to provide {@link org.springframework.data.mongodb.core.MongoTemplate}.
+ * Created by YongTang on 2015/3/20.
  *
  * @author Yong Tang
  * @since 0.4
  */
-public class MongoModule extends AbstractModule {
-
-    /**
-     * Configures a {@link com.google.inject.Binder} via the exposed methods.
-     */
-    @Override
-    protected void configure() {
-
+public class MongoTemplateFactory extends AnnotationClientFactory<MongoTemplate, Mongo> {
+    public MongoTemplateFactory(Mongo[] mongos) {
+        super((mongos));
     }
 
-    /**
-     * Provide an injection point of {@link org.springframework.data.mongodb.core.MongoTemplate} via an injected
-     * {@link com.github.connector.annotations.Mongo}.
-     */
-    @Provides
-    MongoTemplate provideMongoTemplate(Mongo mongo) {
+    @Override
+    protected MongoTemplate createClient(Mongo mongo) {
         String config = mongo.config();
         String host = mongo.host();
         int port = mongo.port();
