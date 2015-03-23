@@ -52,5 +52,4 @@ In the tool box, RestConnector also provides all common HTTP request configurati
 Please be noted that the methods located in proxy interface have to return a RequestBuilder interface or its subclasses in order to make the whole engine work. Should the return value is a RequestBuilder, it is impossible to do any alterations for this request. However if the method returned a subclass, say HttpRequestBuilders, it can leverage the configuration methods, like param, body and header, to more customize the http request.
 
 ## HTTP response handler and transformer
-
-TBC...
+RestConnector has very similar testing API as spring-test-mvc. Therefor it is not surprised that the beautiful fluent API of MockMvc has been inherited in RestConnector.
