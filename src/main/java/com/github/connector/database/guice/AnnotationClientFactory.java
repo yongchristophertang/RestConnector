@@ -1,0 +1,53 @@
+/*
+ * Copyright 2014-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.connector.database.guice;
+
+import com.google.common.collect.Lists;
+
+import java.util.Queue;
+import java.util.stream.Collectors;
+
+/**
+ * Default implementation of {@link com.github.connector.database.guice.ClientFactory} for creating clients from {@link java
+ * .lang.annotation.Annotation}s as {@code annos}.
+ *
+ * @author Yong Tang
+ * @since 0.4
+ */
+public abstract class AnnotationClientFactory<T, A> implements ClientFactory<T> {
+    private final A[] annos;
+    private final Queue<T> clients;
+
+    AnnotationClientFactory(A[] annos) {
+        this.annos = annos;
+        clients = Lists.newLinkedList(
+                Lists.newArrayList(annos).stream().map(this::createClient).collect(Collectors.toList()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Queue<T> buildClients() {
+        return clients;
+    }
+
+    /**
+     * Transfer an annotation to a T object.
+     */
+    abstract protected T createClient(A anno);
+}

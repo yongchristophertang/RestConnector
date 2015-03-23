@@ -134,7 +134,7 @@
             <version>2.4.4</version>
         </dependency>
 
-        <!-- testng and junit, test engine libs -->
+        <!-- testng and junit, engine engine libs -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
