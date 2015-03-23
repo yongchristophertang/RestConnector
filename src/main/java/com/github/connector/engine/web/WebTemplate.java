@@ -35,17 +35,13 @@ import java.util.List;
  * <p>Below is an example:
  * <p/>
  * <pre>
- * static imports:
- * MockMvcBuilders.*, MockMvcRequestBuilders.*, MockMvcResultMatchers.*
  *
- * MockMvc mockMvc =
- *     annotationConfigMvcSetup(TestConfiguration.class)
- *         .configureWarRootDir("src/main/webapp", false).build()
+ * WebTemplate webTemplate = WebTemplateBuilder.defaultConfig().build();
  *
- * mockMvc.perform(get("/form"))
- *     .andExpect(status().isOk())
- *     .andExpect(content().mimeType("text/plain"))
- *     .andExpect(forwardedUrl("/WEB-INF/layouts/main.jsp"));
+ * webTemplate.perform(get(http://localhost:8080).param("test", "test")).andDo(print())
+ *     .andExpect(content().contentType("application/json;charset=utf-8"))
+ *     .andExpect(jsonPath("$.code", is("10004040"))).andTransform(json().parse("$.code")).andDo(print());
+ *
  * </pre>
  *
  * @author Yong Tang

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.connector.database.guice;
+package com.github.connector.database.guice.provider;
 
 import java.util.Queue;
 

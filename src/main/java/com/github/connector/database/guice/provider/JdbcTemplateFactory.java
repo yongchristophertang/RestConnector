@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.connector.database.guice;
+package com.github.connector.database.guice.provider;
 
 import com.github.connector.database.annotations.SqlDB;
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;

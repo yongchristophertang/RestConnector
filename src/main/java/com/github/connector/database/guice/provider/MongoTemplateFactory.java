@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.connector.database.guice;
+package com.github.connector.database.guice.provider;
 
 import com.github.connector.database.annotations.Mongo;
 import com.mongodb.MongoClient;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.io.IOException;

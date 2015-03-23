@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.connector.database.guice;
+package com.github.connector.database.guice.provider;
 
 import com.google.common.collect.Lists;
 
@@ -22,7 +22,7 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
- * Default implementation of {@link com.github.connector.database.guice.ClientFactory} for creating clients from {@link java
+ * Default implementation of {@link ClientFactory} for creating clients from {@link java
  * .lang.annotation.Annotation}s as {@code annos}.
  *
  * @author Yong Tang

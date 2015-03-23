@@ -14,7 +14,20 @@
  * limitations under the License.
  */
 
+package com.github.connector.database.guice;
+
+import com.google.inject.Module;
+
 /**
- * Log4j2 adapter
+ * Factory class to build a {@link com.google.inject.Module}.
+ *
+ * @author Yong Tang
+ * @since 0.4
  */
-package com.github.connector.log4j;
+public interface ModuleBuilder {
+
+    /**
+     * build a module.
+     */
+    Module buildModule();
+}

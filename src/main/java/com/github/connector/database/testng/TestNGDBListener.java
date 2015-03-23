@@ -30,6 +30,11 @@ import org.testng.TestListenerAdapter;
  * TestNG DB listener to create db injection module for each engine class at the initiation and to close all db
  * connections while deconstruction of this engine class.
  *
+ * Example is:
+ * <pre>
+ *     @Listeners(TestNGDBListener.class)
+ * </pre>
+ *
  * @author Yong Tang
  * @since 0.4
  */

@@ -91,14 +91,6 @@
         </dependency>
         <!-- http client end -->
 
-        <!-- RESTEasy client begins
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-client</artifactId>
-            <version>3.0.10.Final</version>
-        </dependency>
-         RESTEasy client ends -->
-
         <!-- utilities lib start -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -152,7 +144,6 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.26</version>
-            <scope>runtime</scope>
         </dependency>
 
         <dependency>
@@ -174,43 +165,6 @@
             <version>2.3.0</version>
         </dependency>
 
-        <!-- reportng local -->
-        <dependency>
-            <groupId>org.uncommons</groupId>
-            <artifactId>reportng</artifactId>
-            <version>1.2.3-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-            <version>1.7</version>
-        </dependency>
-
-        <!-- JOOQ dependencies -->
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq</artifactId>
-            <version>3.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq-meta</artifactId>
-            <version>3.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq-codegen</artifactId>
-            <version>3.5.0</version>
-        </dependency>
-
-        <!-- Reflections lib -->
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>0.9.9</version>
-        </dependency>
-
         <!-- Dependency Injection -->
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -218,11 +172,19 @@
             <version>3.0</version>
         </dependency>
 
+        <!-- Utils -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+
+
     </dependencies>
 
 
     <build>
-        <finalName>iTestConnector</finalName>
+        <finalName>RestConnector</finalName>
         <defaultGoal>install</defaultGoal>
 
         <plugins>

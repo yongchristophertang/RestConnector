@@ -14,7 +14,20 @@
  * limitations under the License.
  */
 
+package com.github.connector.database.junit;
+
+import com.github.connector.database.annotations.SqlDB;
+import org.junit.Rule;
+
 /**
- * Log4j2 adapter
+ * Created by YongTang on 2015/3/23.
+ *
+ * @author Yong Tang
+ * @since 0.4
  */
-package com.github.connector.log4j;
+@SqlDB(url = "111", userName = "222", password = "333")
+@SqlDB(url = "333", userName = "222", password = "333")
+public abstract class AbstractJUnitGuiceTestBase {
+    @Rule
+    public JUnit4DBInjectionRule rule = new JUnit4DBInjectionRule();
+}
