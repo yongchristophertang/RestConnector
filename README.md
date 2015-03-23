@@ -25,6 +25,7 @@ Besides the basic usage for HTTP testing which is composed of many tedious and d
 
 See the example below:
 ```java
+
  @Test
  public void test() throws Exception {
      WebTemplate webTemplate = WebTemplateBuilder.defaultConfig().build();
@@ -34,13 +35,22 @@ See the example below:
 
 In this example, we do not build the request manually. Instead, we construct it with a proxied interface: TestAPI. Let's see what it looks like:
 ```java
+
 @Host(value = "http://localhost", port = 8080)
 @Path("/test")
 public interface TestAPI {
     @Path("/proxy")
     @GET
-    public RequestBuilder getBooks(@QueryParam("version") int version, @QueryParam("token") String token);
+    public RequestBuilder demo(@QueryParam("version") int version, @QueryParam("token") String token);
 }
 ```
 
-Here we use JAVA annotations to accomplish the configuration of HTTP request, which are all very self-explained. For instance, @Host can config the request server host and its port and @QueryParms can set corresponding query parameters. And finally the above two code snippets can produce an HTTP request as: http://localhost:8080/test/proxy?version=1&token=ignored
+Here we use JAVA annotations to accomplish the configuration of HTTP request, which are all very self-explained. For instance, @Host can config the request server host and its port and @QueryParms can set corresponding query parameters. And finally the above two code snippets can produce an HTTP request as: GET http://localhost:8080/test/proxy?version=1&token=ignored
+
+In the tool box, RestConnector also provides all common HTTP request configurations which will be explained in JavaDoc in details.
+
+Please be noted that the methods located in proxy interface have to return a RequestBuilder interface or its subclasses in order to make the whole engine work. Should the return value is a RequestBuilder, it is impossible to do any alterations for this request. However if the method returned a subclass, say HttpRequestBuilders, it can leverage the configuration methods, like param, body and header, to more customize the http request.
+
+## HTTP response handler and transformer
+
+TBC...

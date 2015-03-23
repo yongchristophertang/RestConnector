@@ -20,7 +20,8 @@ import java.lang.annotation.*;
 
 /**
  * Binds the value of a URI template parameter or a path segment
- * containing the template parameter to a resource method parameter
+ * containing the template parameter to a resource method parameter, the path segment should be in the format of
+ * ${PathParam}.
  */
 @Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
