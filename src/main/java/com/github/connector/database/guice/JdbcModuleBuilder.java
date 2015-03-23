@@ -49,9 +49,7 @@ public class JdbcModuleBuilder extends DBAnnotationModuleBuilder {
 
             @Provides
             JdbcTemplate provideJdbcTemplate(ClientFactory<JdbcTemplate> factory) {
-                JdbcTemplate jdbcTemplate = factory.buildClients().poll();
-                factory.buildClients().add(jdbcTemplate);
-                return jdbcTemplate;
+                return factory.buildClients().poll();
             }
         };
     }

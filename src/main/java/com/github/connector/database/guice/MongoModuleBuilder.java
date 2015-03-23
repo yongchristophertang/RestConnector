@@ -26,7 +26,8 @@ import com.google.inject.TypeLiteral;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
- * Builder to create a module which can provide {@link org.springframework.data.mongodb.core.MongoTemplate} injection from all
+ * Builder to create a module which can provide {@link org.springframework.data.mongodb.core.MongoTemplate} injection
+ * from all
  * marked {@link com.github.connector.database.annotations.Mongo} annotations on {@code Class<?> clazz} and its
  * superclasses.
  *
@@ -50,9 +51,7 @@ public class MongoModuleBuilder extends DBAnnotationModuleBuilder {
 
             @Provides
             MongoTemplate provideMontoTemplate(ClientFactory<MongoTemplate> factory) {
-                MongoTemplate mongoTemplate = factory.buildClients().poll();
-                factory.buildClients().add(mongoTemplate);
-                return mongoTemplate;
+                return factory.buildClients().poll();
             }
         };
     }

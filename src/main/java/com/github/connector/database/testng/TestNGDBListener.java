@@ -18,7 +18,6 @@ package com.github.connector.database.testng;
 
 import com.google.common.collect.Lists;
 import com.google.inject.*;
-import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.testng.ITestClass;
@@ -27,8 +26,7 @@ import org.testng.ITestNGMethod;
 import org.testng.TestListenerAdapter;
 
 /**
- * TestNG DB listener to create db injection module for each engine class at the initiation and to close all db
- * connections while deconstruction of this engine class.
+ * TestNG DB listener to create db injection module for each test class at the initiation
  *
  * Example is:
  * <pre>
@@ -65,26 +63,5 @@ public class TestNGDBListener extends TestListenerAdapter {
 
         context.addGuiceModule(Module.class, module);
         context.addInjector(Lists.newArrayList(module), injector);
-    }
-
-    @Override
-    public void onFinish(ITestContext context) {
-        while (true) {
-            JdbcTemplate jdbcTemplate = jdbcTemplateProvider.get();
-            if (jdbcTemplate.getDataSource() == null) {
-                break;
-            }
-            ((HikariDataSource) jdbcTemplate.getDataSource()).close();
-            jdbcTemplate.setDataSource(null);
-        }
-
-        while (true) {
-            MongoTemplate mongoTemplate = mongoTemplateProvider.get();
-            if (mongoTemplate == null) {
-                break;
-            }
-            mongoTemplate.getDb().getMongo().close();
-            mongoTemplate = null;
-        }
     }
 }
