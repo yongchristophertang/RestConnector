@@ -7,7 +7,7 @@ RestConnector can conveniently accomplish the testing process for RESTful HTTP s
 The main aim of RestConnector is for achieving a better and convenient experience to test RESTful HTTP web services. Let's take some examples to illustrate the testing process:
 
 ```java
- import static com.github.connector.engine.web.request.TestRequestBuilders.*;
+ import static TestRequestBuilders.*;
 
  @Test
  public void test() throws Exception {
@@ -25,7 +25,7 @@ Besides the basic usage for HTTP testing which is composed of many tedious and d
 
 See the example below:
 ```java
-import static com.github.connector.engine.web.request.TestRequestBuilders.*;
+import static TestRequestBuilders.*;
 
  @Test
  public void test() throws Exception {
