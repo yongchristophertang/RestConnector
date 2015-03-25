@@ -16,6 +16,7 @@
 
 package com.connector.rest.engine.web;
 
+import com.connector.rest.engine.AssertUtils;
 import com.connector.rest.engine.web.request.RequestBuilder;
 import com.connector.rest.engine.web.response.DefaultHttpResult;
 import com.connector.rest.engine.web.response.DefaultResultActions;
@@ -24,7 +25,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClients;
-import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +87,7 @@ public final class WebTemplate {
      * @see WebTemplateBuilder#alwaysExpect
      */
     void setDefaultResultMatchers(List<ResultMatcher> resultMatchers) {
-        Assert.notNull(resultMatchers, "resultMatchers is required");
+        AssertUtils.notNull(resultMatchers, "resultMatchers is required");
         this.defaultResultMatchers = resultMatchers;
     }
 
@@ -97,7 +97,7 @@ public final class WebTemplate {
      * @see WebTemplateBuilder#alwaysDo
      */
     void setDefaultResultHandlers(List<ResultHandler> resultHandlers) {
-        Assert.notNull(resultHandlers, "resultHandlers is required");
+        AssertUtils.notNull(resultHandlers, "resultHandlers is required");
         this.defaultResultHandlers = resultHandlers;
     }
 }

@@ -19,25 +19,24 @@ package com.connector.rest.database.guice.provider;
 import com.connector.rest.database.annotations.Mongo;
 import com.mongodb.MongoClient;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
 /**
- * Factory to create {@link org.springframework.data.mongodb.core.MongoTemplate}s via {@link Mongo}s.
+ * Factory to create {@link com.mongodb.MongoClient}s via {@link Mongo}s.
  *
  * @author Yong Tang
  * @since 0.4
  */
-public class MongoTemplateFactory extends AnnotationClientFactory<MongoTemplate, Mongo> {
-    public MongoTemplateFactory(Mongo[] mongos) {
+public class MongoFactory extends AnnotationClientFactory<MongoClient, Mongo> {
+    public MongoFactory(Mongo[] mongos) {
         super((mongos));
     }
 
     @Override
-    protected MongoTemplate createClient(Mongo mongo) {
+    protected MongoClient createClient(Mongo mongo) {
         String config = mongo.config();
         String host = mongo.host();
         int port = mongo.port();
@@ -53,14 +52,13 @@ public class MongoTemplateFactory extends AnnotationClientFactory<MongoTemplate,
                 prop.load(this.getClass().getClassLoader().getResourceAsStream(config));
                 host = prop.getProperty("mongo.host");
                 port = Integer.parseInt(prop.getProperty("mongo.port"));
-                database = prop.getProperty("mongo.database");
             } catch (IOException e) {
                 return null;
             }
         }
 
         try {
-            return new MongoTemplate(new MongoClient(host, port), database);
+            return new MongoClient(host, port);
         } catch (UnknownHostException e) {
             return null;
         }

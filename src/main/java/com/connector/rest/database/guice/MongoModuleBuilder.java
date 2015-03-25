@@ -18,15 +18,15 @@ package com.connector.rest.database.guice;
 
 import com.connector.rest.database.annotations.Mongo;
 import com.connector.rest.database.guice.provider.ClientFactory;
-import com.connector.rest.database.guice.provider.MongoTemplateFactory;
+import com.connector.rest.database.guice.provider.MongoFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import com.mongodb.MongoClient;
 
 /**
- * Builder to create a module which can provide {@link org.springframework.data.mongodb.core.MongoTemplate} injection
+ * Builder to create a module which can provide {@link com.mongodb.MongoClient} injection
  * from all
  * marked {@link com.connector.rest.database.annotations.Mongo} annotations on {@code Class<?> clazz} and its
  * superclasses.
@@ -45,12 +45,12 @@ public class MongoModuleBuilder extends DBAnnotationModuleBuilder {
         return new AbstractModule() {
             @Override
             protected void configure() {
-                bind(new TypeLiteral<ClientFactory<MongoTemplate>>() {
-                }).toInstance(new MongoTemplateFactory(getAnnotations(null, clazz, Mongo.class)));
+                bind(new TypeLiteral<ClientFactory<MongoClient>>() {
+                }).toInstance(new MongoFactory(getAnnotations(null, clazz, Mongo.class)));
             }
 
             @Provides
-            MongoTemplate provideMontoTemplate(ClientFactory<MongoTemplate> factory) {
+            MongoClient provideMontoTemplate(ClientFactory<MongoClient> factory) {
                 return factory.buildClients().poll();
             }
         };

@@ -18,7 +18,8 @@ package com.connector.rest.database.junit;
 
 import com.google.inject.Inject;
 import org.junit.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.sql.DataSource;
 
 /**
  * Created by YongTang on 2015/3/23.
@@ -29,20 +30,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class GuiceJUnitTest extends AbstractJUnitGuiceTestBase {
 
     @Inject
-    private JdbcTemplate jdbcTemplate;
+    private DataSource dataSource;
 
     @Inject
-    private JdbcTemplate jdbcTemplate2;
+    private DataSource dataSource2;
 
     @Test
     public void demoTest() {
-        System.out.println(jdbcTemplate);
-        System.out.println(jdbcTemplate2);
+        System.out.println(dataSource);
+        System.out.println(dataSource2);
     }
 
     @Test
     public void demoTest2() {
-        System.out.println(jdbcTemplate);
-        System.out.println(jdbcTemplate2);
+        System.out.println(dataSource);
+        System.out.println(dataSource2);
     }
 }

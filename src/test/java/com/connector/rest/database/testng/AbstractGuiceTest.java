@@ -25,7 +25,7 @@ import org.testng.annotations.Guice;
  * @author Yong Tang
  * @since 0.4
  */
-@Guice(moduleFactory = TestNGDBModuleFactory.class)
+@Guice(moduleFactory = TestNGDBInjectionModuleFactory.class)
 @SqlDB(url = "111", userName = "222", password = "333")
 public abstract class AbstractGuiceTest {
 }

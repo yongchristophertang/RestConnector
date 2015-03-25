@@ -18,10 +18,11 @@ package com.connector.rest.database.testng;
 
 import com.connector.rest.database.annotations.SqlDB;
 import com.google.inject.Inject;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import javax.sql.DataSource;
 
 /**
  * Created by YongTang on 2015/3/16.
@@ -32,16 +33,16 @@ import org.testng.annotations.Test;
 @Test
 @SqlDB(url = "111", userName = "222", password = "333")
 @SqlDB(url = "333", userName = "222", password = "333")
-@Listeners(TestNGDBListener.class)
+@Listeners(TestNGDBInjectionListener.class)
 public class GuiceTest extends AbstractGuiceTest {
 //    @Inject
 //    private Provider<JdbcTemplate> jdbcTemplateProvider;
 
     @Inject
-    private JdbcTemplate jdbcTemplate;
+    private DataSource dataSource;
 
     @Inject
-    private JdbcTemplate jdbcTemplate2;
+    private DataSource dataSource2;
 
 
     @BeforeClass
@@ -52,14 +53,14 @@ public class GuiceTest extends AbstractGuiceTest {
 
     @Test
     private void testDemo() {
-        System.out.println(jdbcTemplate);
-        System.out.println(jdbcTemplate2);
+        System.out.println(dataSource);
+        System.out.println(dataSource2);
     }
 
     @Test
     private void testDemo2() {
-        System.out.println(jdbcTemplate);
-        System.out.println(jdbcTemplate2);
+        System.out.println(dataSource);
+        System.out.println(dataSource2);
     }
 
 }

@@ -25,7 +25,7 @@ import com.connector.rest.engine.web.request.RequestBuilder;
  * @author Yong Tang
  * @since 0.4
  */
-@Host(value = "http://172.16.79.22", port = 11391)
+@Host(location = "http_config.properties")
 @Path("/v5/categories")
 public interface TestAPI {
 

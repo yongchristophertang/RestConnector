@@ -19,25 +19,25 @@ package com.connector.rest.database.guice.provider;
 import com.connector.rest.database.annotations.SqlDB;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Factory to create {@link org.springframework.jdbc.core.JdbcTemplate}s via {@link SqlDB}s.
+ * Factory to create {@link javax.sql.DataSource}s via {@link SqlDB}s.
  *
  * @author Yong Tang
  * @since 0.4
  */
-public class JdbcTemplateFactory extends AnnotationClientFactory<JdbcTemplate, SqlDB> {
+public class DataSourceFactory extends AnnotationClientFactory<DataSource, SqlDB> {
 
-    public JdbcTemplateFactory(SqlDB[] annos) {
+    public DataSourceFactory(SqlDB[] annos) {
         super(annos);
     }
 
     @Override
-    protected JdbcTemplate createClient(SqlDB anno) {
+    protected DataSource createClient(SqlDB anno) {
         String config = anno.config();
         String user = anno.userName();
         String url = anno.url();
@@ -63,6 +63,6 @@ public class JdbcTemplateFactory extends AnnotationClientFactory<JdbcTemplate, S
         ds.setJdbcUrl(url);
         ds.setUsername(user);
         ds.setPassword(password);
-        return new JdbcTemplate(ds);
+        return ds;
     }
 }

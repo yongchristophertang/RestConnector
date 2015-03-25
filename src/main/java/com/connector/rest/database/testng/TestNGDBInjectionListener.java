@@ -17,9 +17,9 @@
 package com.connector.rest.database.testng;
 
 import com.google.common.collect.Lists;
-import com.google.inject.*;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 import org.testng.ITestClass;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
@@ -27,7 +27,7 @@ import org.testng.TestListenerAdapter;
 
 /**
  * TestNG DB listener to create db injection module for each test class at the initiation
- *
+ * <p/>
  * Example is:
  * <pre>
  *     @Listeners(TestNGDBListener.class)
@@ -36,13 +36,7 @@ import org.testng.TestListenerAdapter;
  * @author Yong Tang
  * @since 0.4
  */
-public class TestNGDBListener extends TestListenerAdapter {
-
-    @Inject
-    private Provider<JdbcTemplate> jdbcTemplateProvider;
-
-    @Inject
-    private Provider<MongoTemplate> mongoTemplateProvider;
+public class TestNGDBInjectionListener extends TestListenerAdapter {
 
     @Override
     public void onStart(ITestContext context) {
@@ -55,7 +49,7 @@ public class TestNGDBListener extends TestListenerAdapter {
         ITestClass testClass = methods[0].getTestClass();
         Object[] testInstances = testClass.getInstances(true);
 
-        Module module = new TestNGDBModuleFactory().createModule(context, testClass.getRealClass());
+        Module module = new TestNGDBInjectionModuleFactory().createModule(context, testClass.getRealClass());
 
         Injector injector = Guice.createInjector(module);
         Lists.newArrayList(testInstances).forEach(injector::injectMembers);

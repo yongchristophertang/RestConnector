@@ -1,8 +1,8 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.connector</groupId>
-    <artifactId>RestConnector</artifactId>
+    <groupId>com.connector.rest</groupId>
+    <artifactId>rest-connector</artifactId>
     <version>0.4-SNAPSHOT</version>
     <name>RestConnector</name>
 
@@ -12,34 +12,12 @@
 
     <repositories>
     </repositories>
-<!--
+
     <distributionManagement>
-        <repository>
-            <id>nexus_20</id>
-            <name>Nexus Releses Repository</name>
-            <url>http://172.16.79.20:8081/nexus/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus_20</id>
-            <name>Nexus Snapshots Repository</name>
-            <url>http://172.16.79.20:8081/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement> -->
+
+    </distributionManagement>
 
     <dependencies>
-        <!-- spring db start: jdbc and mongo -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>4.1.2.RELEASE</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-mongodb</artifactId>
-            <version>1.5.0.RELEASE</version>
-        </dependency>
-        <!-- spring db Lib end -->
 
         <!-- Json Path and Json Assert Lib start -->
         <dependency>

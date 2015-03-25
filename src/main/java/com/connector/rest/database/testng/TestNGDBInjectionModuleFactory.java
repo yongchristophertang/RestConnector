@@ -34,7 +34,7 @@ import org.testng.ITestContext;
  * @author Yong Tang
  * @since 0.4
  */
-public class TestNGDBModuleFactory implements IModuleFactory {
+public class TestNGDBInjectionModuleFactory implements IModuleFactory {
     /**
      * Check the class annotations, instantiate modules respectively.
      *

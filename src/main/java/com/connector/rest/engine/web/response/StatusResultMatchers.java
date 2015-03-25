@@ -48,7 +48,7 @@ public class StatusResultMatchers {
      * Assert the response status code is equal to an integer value.
      */
     public ResultMatcher is(int status) {
-        return is(status);
+        return is(CoreMatchers.is(status));
     }
 
 

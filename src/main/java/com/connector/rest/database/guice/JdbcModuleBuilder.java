@@ -18,15 +18,16 @@ package com.connector.rest.database.guice;
 
 import com.connector.rest.database.annotations.SqlDB;
 import com.connector.rest.database.guice.provider.ClientFactory;
-import com.connector.rest.database.guice.provider.JdbcTemplateFactory;
+import com.connector.rest.database.guice.provider.DataSourceFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.sql.DataSource;
 
 /**
- * Builder to create a module which can provide {@link org.springframework.jdbc.core.JdbcTemplate} injection from all
+ * Builder to create a module which can provide {@link javax.sql.DataSource} injection from all
  * marked {@link com.connector.rest.database.annotations.SqlDB} annotations on {@code Class<?> clazz} and its
  * superclasses.
  *
@@ -43,12 +44,12 @@ public class JdbcModuleBuilder extends DBAnnotationModuleBuilder {
         return new AbstractModule() {
             @Override
             protected void configure() {
-                bind(new TypeLiteral<ClientFactory<JdbcTemplate>>() {
-                }).toInstance(new JdbcTemplateFactory(getAnnotations(null, clazz, SqlDB.class)));
+                bind(new TypeLiteral<ClientFactory<DataSource>>() {
+                }).toInstance(new DataSourceFactory(getAnnotations(null, clazz, SqlDB.class)));
             }
 
             @Provides
-            JdbcTemplate provideJdbcTemplate(ClientFactory<JdbcTemplate> factory) {
+            DataSource provideJdbcTemplate(ClientFactory<DataSource> factory) {
                 return factory.buildClients().poll();
             }
         };

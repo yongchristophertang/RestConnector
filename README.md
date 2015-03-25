@@ -68,61 +68,61 @@ In this code snippet, first we use `andDo` to print the HTTP process, and then w
 ## DB configuration and injection
 It is very common that database manipulation is involved in the test case. We use database to generate test data, validate test results and even store test products. RestConnector provides built-in support for Sql and Mongo databases, which are injected into test cases using google guice.
 
-This db support can be applied to both JUnit4 and TestNG, all of which are implemented with Guice integration. And the support is a non-intrusive plugin to the test engine, which will not impact on any behaviours that JUnit or TestNG offer.
+This db support can be applied to both JUnit4 and TestNG, all of which are implemented with [Guice](https://github.com/google/guice) integration. And the support is a non-intrusive plugin to the test engine, which will not impact on any behaviours that JUnit or TestNG offer.
 
 First, we see an example using TestNG:
 ```java
 @Test
 @SqlDB(url = "testurl1", userName = "user1", password = "pwd1")
 @SqlDB(url = "testurl2", userName = "user2", password = "pwd2")
-@Listeners(TestNGDBListener.class)
+@Listeners(TestNGDBInjectionListener.class)
 public class GuiceTest {
 
     @Inject
-    private JdbcTemplate jdbcTemplate;
+    private DataSource dataSource;
 
     @Inject
-    private JdbcTemplate jdbcTemplate2;
+    private DataSource dataSource2;
 
 
     @Test
     private void testDemo() {
-        System.out.println(jdbcTemplate);
-        System.out.println(jdbcTemplate2);
+        System.out.println(dataSource);
+        System.out.println(dataSource2);
     }
 
     @Test
     private void testDemo2() {
-        System.out.println(jdbcTemplate);
-        System.out.println(jdbcTemplate2);
+        System.out.println(dataSource);
+        System.out.println(dataSource2);
     }
 }
 ```
 
-In the above example, the `TestNGDBListener` is used as a TestNG listener to run the case, which actually provides the guice injection of all database internally. We could use `@Inject` to inject a `JdbcTemplate` into the test case, which is an Sql DB manipulating template developed by [Spring-Jdbc](https://github.com/spring-projects/spring-framework).
+In the above example, the `TestNGDBInjectionListener` is used as a TestNG listener to run the case, which actually provides the guice injection of all database internally. We could use `@Inject` to inject a `DataSource` into the test case according to configurations in respective `@SqlDB` annotation, which is an Sql DB abstraction. Internally we use a [Hikari DBCP](https://github.com/brettwooldridge/HikariCP) to implement DataSource interface, please refer to it for detailed information.
 
 There is one issue should be pointed out that this database injection is based on the class level, that means the `testDemo` and `testDemo2` have the same instances of `jdbcTemplate` and `jdbcTemplate2`.
 
 The counterpart to JUnit4 is:
 ```java
-@Mongo(host = "localhost", port = 30017, database = "categories")
+@Mongo(host = "localhost", port = 30017)
 public class GuiceJUnitTest {
     @Rule
     public JUnit4DBInjectionRule rule = new JUnit4DBInjectionRule();
 
     @Inject
-    private MongoTemplate mongoTemplate;
+    private MongoClient mongoClient;
 
     @Test
     public void demoTest() {
-        System.out.println(mongoTemplate);
+        System.out.println(mongoClient);
     }
 
     @Test
     public void demoTest2() {
-        System.out.println(mongoTemplate);
+        System.out.println(mongoClient);
     }
 }
 ```
 
-As using TestNG, we create a JUnit rule `JUnit4DBInjectionRule` to realize the same functionality like `TestNGDBListener`. The injected mongo processor is a `MongoTemplate` which provides a series mongo manipulation abilities created by [Spring-mongo project](https://github.com/spring-projects/spring-data-mongodb). Please be noted that the injected mongo template is also a class level instance.
+As using TestNG, we create a JUnit rule `JUnit4DBInjectionRule` to realize the same functionality as `TestNGDBInjectionListener`. The injected mongo processor is a `MongoClient` which provides an abstraction for mongodb connection. Please be noted that the injected mongo template is also a class level instance.

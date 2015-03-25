@@ -150,10 +150,14 @@ public final class RequestProxy implements InvocationHandler {
             url = host.value() + ":" + host.port();
         } else if (!Strings.isNullOrEmpty(host.location())) {
             Properties properties = new Properties();
-            properties.load(this.getClass().getResourceAsStream(host.location()));
+            properties.load(this.getClass().getClassLoader().getResourceAsStream(host.location()));
             url = properties.getProperty("http.host") + ":" + properties.getProperty("http.port");
         } else {
             throw new IllegalArgumentException("Host is not defined");
+        }
+
+        if (!url.startsWith("http://")) {
+            url = "http://" + url;
         }
         return url;
     }
