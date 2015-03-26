@@ -21,8 +21,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.lang.annotation.Annotation;
 
 /**
- * Abstract builder to build a {@link com.google.inject.Module} from an annotation class {@code Class<A extends
- * Annotation>}.
+ * Abstract builder to build a {@link com.google.inject.Module} from an annotation class {@code Class\<A extends
+ * Annotation\>}.
  *
  * @author Yong Tang
  * @since 0.4
@@ -35,15 +35,12 @@ public abstract class DBAnnotationModuleBuilder implements ModuleBuilder {
     }
 
     /**
-     * Return all marked {@link java.lang.annotation.Annotation}s from the {@code Class<?> testClass} and its
+     * Return all marked {@link java.lang.annotation.Annotation}s from the {@code Class\<\?\> testClass} and its
      * superclasses.
      */
     protected <A extends Annotation> A[] getAnnotations(A[] annos, Class<?> testClass, Class<A> annoClass) {
-        if (testClass == Object.class) {
-            return annos;
-        } else {
-            return getAnnotations(ArrayUtils.addAll(annos, testClass.getAnnotationsByType(annoClass)),
-                    testClass.getSuperclass(), annoClass);
-        }
+        return testClass == Object.class ? annos :
+                getAnnotations(ArrayUtils.addAll(annos, testClass.getAnnotationsByType(annoClass)),
+                        testClass.getSuperclass(), annoClass);
     }
 }

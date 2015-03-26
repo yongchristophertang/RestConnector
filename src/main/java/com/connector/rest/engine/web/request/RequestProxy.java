@@ -168,9 +168,6 @@ public final class RequestProxy implements InvocationHandler {
     }
 
     private String removeTrailingSlash(String path) {
-        if (!path.endsWith("/")) {
-            return path;
-        }
-        return removeTrailingSlash(path.substring(0, path.length() - 1));
+        return path.endsWith("/") ? removeTrailingSlash(path.substring(0, path.length() - 1)) : path;
     }
 }
