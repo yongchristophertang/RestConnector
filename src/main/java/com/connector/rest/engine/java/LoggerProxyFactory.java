@@ -68,7 +68,8 @@ public class LoggerProxyFactory<T> implements ProxyFactory<T>, InvocationHandler
         List<String> type =
                 Lists.newArrayList(method.getParameterTypes()).stream().map(Class::getSimpleName).collect(
                         Collectors.toList());
-        IntStream.range(0, type.size()).forEach(i -> logger.info("Input" + i + " (" + type.get(i) + "): " + args[i]));
+        IntStream.range(0, type.size())
+                .forEach(i -> logger.info("Input" + (i + 1) + " (" + type.get(i) + "): " + args[i]));
 
         long bf = System.nanoTime();
         Object result = method.invoke(client, args);

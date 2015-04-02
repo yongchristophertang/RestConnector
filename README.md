@@ -101,7 +101,7 @@ public class GuiceTest {
 
 In the above example, the `TestNGDBInjectionListener` is used as a TestNG listener to run the case, which actually provides the guice injection of all database internally. We could use `@Inject` to inject a `DataSource` into the test case according to configurations in respective `@SqlDB` annotation, which is an Sql DB abstraction. Internally we use a [Hikari DBCP](https://github.com/brettwooldridge/HikariCP) to implement DataSource interface, please refer to it for detailed information.
 
-There is one issue should be pointed out that this database injection is based on the class level, that means the `testDemo` and `testDemo2` have the same instances of `jdbcTemplate` and `jdbcTemplate2`.
+There is one issue should be pointed out that this database injection is based on the class level, that means the `testDemo` and `testDemo2` have the same instances of `dataSource` and `dataSource2`.
 
 The counterpart to JUnit4 is:
 ```java
