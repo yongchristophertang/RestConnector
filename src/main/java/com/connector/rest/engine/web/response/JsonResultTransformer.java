@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Factory for json result transformation. An instance of this class is typically accessed via {@link com.github
- * .connector.engine.web.response.HttpResultTransformers#json}
+ * Factory for json result transformation. An instance of this class is typically accessed via {@link com.connector
+ * .rest.engine.web.response.HttpResultTransformers#json}
  *
  * @author Yong Tang
  * @since 0.4
@@ -42,15 +42,15 @@ public class JsonResultTransformer {
     }
 
     /**
-     * Parse the result into a sub part json via evaluation of expression. And create another {@link com.github
-     * .connector.engine.web.ResultActions} instance which incorporate this json as response for further processing.
+     * Parse the result into a sub part json via evaluation of expression. And create another {@link com.connector
+     * .rest.engine.web.ResultActions} instance which incorporate this json as response for further processing.
      *
      * @param expression the JSON path expression
      */
     public ResultTransform<ResultActions> parse(String expression) {
         return result -> {
             JsonPath jsonPath = JsonPath.compile(expression);
-            String content = jsonPath.read(result.getResponseStringContent());
+            String content = jsonPath.read(result.getResponseStringContent()).toString();
             DefaultHttpResult httpResult = new DefaultHttpResult(result);
             httpResult.setHttpResponse(content);
             return new DefaultResultActions(httpResult);

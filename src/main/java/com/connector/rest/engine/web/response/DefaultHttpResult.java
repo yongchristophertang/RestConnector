@@ -17,6 +17,7 @@
 package com.connector.rest.engine.web.response;
 
 import com.connector.rest.engine.web.HttpResult;
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -53,6 +54,16 @@ public class DefaultHttpResult implements HttpResult {
         this.httpRequest = httpResult.getHttpRequest();
         this.httpResponse = httpResult.getHttpResponse();
         this.time = httpResult.getCostTime();
+    }
+
+    /**
+     * Only for test
+     */
+    @VisibleForTesting
+    DefaultHttpResult() {
+        httpRequest = null;
+        httpResponse = null;
+        time = 0;
     }
 
     @Override

@@ -107,9 +107,13 @@ public final class RequestProxy implements InvocationHandler {
         notNull(httpMethods.get(0).value(), "Http Method is not defined");
         HttpMethod httpMethod = HttpMethod.valueOf(httpMethods.get(0).value());
 
+        // insert parameters into url
         Parameter[] parameters = method.getParameters();
         IntStream.range(0, parameters.length).forEach(i -> {
             Parameter p = parameters[i];
+            if (args[i] == null) {
+                return;
+            }
             if (p.isAnnotationPresent(PathParam.class)) {
                 pathParams.put(p.getAnnotation(PathParam.class).value(), args[i].toString());
             } else if (p.isAnnotationPresent(BodyParam.class)) {

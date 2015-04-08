@@ -37,4 +37,5 @@ public abstract class HttpResultTransformers {
     public static XmlResultTransformer xml() {
         return new XmlResultTransformer();
     }
+
 }
