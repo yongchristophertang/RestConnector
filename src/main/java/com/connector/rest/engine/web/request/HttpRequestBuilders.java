@@ -28,7 +28,9 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.*;
 
 import static com.connector.rest.engine.AssertUtils.*;
@@ -172,7 +174,8 @@ public class HttpRequestBuilders implements RequestBuilder {
      *
      * @param content the body content
      */
-    public HttpRequestBuilders body(String content) {
+    public HttpRequestBuilders body(String content) throws UnsupportedEncodingException {
+        content = URLEncoder.encode(content, "UTF-8");
         return body(content.getBytes());
     }
 
@@ -185,6 +188,13 @@ public class HttpRequestBuilders implements RequestBuilder {
     public HttpRequestBuilders body(String param, String value) {
         notNull(param, "Parameter must not be null");
         stringNotBlank(value, "Value must not be blank");
+
+        try {
+            param = URLEncoder.encode(param, "UTF-8");
+            value = URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         if (content != null && content.length > 0) {
             content = (new String(content) + "&" + param + "=" + value).getBytes();

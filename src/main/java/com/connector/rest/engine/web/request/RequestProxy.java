@@ -53,12 +53,14 @@ public final class RequestProxy implements InvocationHandler {
         return INSTANCE;
     }
 
+    // TODO: too messy, need to refactor
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Map<String, String> queryParams = new HashMap<>();
         Map<String, String> bodyParams = new HashMap<>();
         Map<String, String> pathParams = new HashMap<>();
         Map<String, String> fileParams = new HashMap<>();
+        Map<String, String> headerParams = new HashMap<>();
         String contentType = null;
         String accept = null;
 
@@ -76,11 +78,13 @@ public final class RequestProxy implements InvocationHandler {
         }).forEach(f -> {
             try {
                 if (f.isAnnotationPresent(PathParam.class)) {
-                    pathParams.put(f.getAnnotation(PathParam.class).value(), f.get(null).toString());
+                    pathParams.put(f.getAnnotation(PathParam.class).value(), String.valueOf(f.get(null)));
                 } else if (f.isAnnotationPresent(BodyParam.class)) {
-                    bodyParams.put(f.getAnnotation(BodyParam.class).value(), f.get(null).toString());
+                    bodyParams.put(f.getAnnotation(BodyParam.class).value(), String.valueOf(f.get(null)));
                 } else if (f.isAnnotationPresent(QueryParam.class)) {
-                    queryParams.put(f.getAnnotation(QueryParam.class).value(), f.get(null).toString());
+                    queryParams.put(f.getAnnotation(QueryParam.class).value(), String.valueOf(f.get(null)));
+                } else if (f.isAnnotationPresent(HeaderParam.class)) {
+                    headerParams.put(f.getAnnotation(HeaderParam.class).value(), String.valueOf(f.get(null)));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -122,6 +126,8 @@ public final class RequestProxy implements InvocationHandler {
                 fileParams.put(p.getAnnotation(FileParam.class).value(), args[i].toString());
             } else if (p.isAnnotationPresent(QueryParam.class)) {
                 queryParams.put(p.getAnnotation(QueryParam.class).value(), args[i].toString());
+            } else if (p.isAnnotationPresent(HeaderParam.class)) {
+                headerParams.put(p.getAnnotation(HeaderParam.class).value(), args[i].toString());
             }
         });
 
@@ -130,6 +136,7 @@ public final class RequestProxy implements InvocationHandler {
             pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
             queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
             bodyParams.keySet().stream().forEach(key -> builders.body(key, bodyParams.get(key)));
+            headerParams.keySet().stream().forEach(key->builders.header(key, headerParams.get(key)));
             Optional.ofNullable(contentType).ifPresent(builders::contentType);
             Optional.ofNullable(accept).ifPresent(builders::accept);
             return builders;
@@ -137,6 +144,7 @@ public final class RequestProxy implements InvocationHandler {
             HttpMultipartRequestBuilders builders = new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), url);
             pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
             queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
+            headerParams.keySet().stream().forEach(key->builders.header(key, headerParams.get(key)));
             bodyParams.keySet().stream()
                     .forEach(key -> builders.body(MultipartBodyFormBuilder.create().param(key, bodyParams.get(key))));
             fileParams.keySet().stream().forEach(key -> builders.body(

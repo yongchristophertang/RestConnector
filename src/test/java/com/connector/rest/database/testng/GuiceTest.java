@@ -19,7 +19,6 @@ package com.connector.rest.database.testng;
 import com.connector.rest.database.annotations.SqlDB;
 import com.google.inject.Inject;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import javax.sql.DataSource;
@@ -33,7 +32,6 @@ import javax.sql.DataSource;
 @Test
 @SqlDB(url = "111", userName = "222", password = "333")
 @SqlDB(url = "333", userName = "222", password = "333")
-@Listeners(TestNGDBInjectionListener.class)
 public class GuiceTest extends AbstractGuiceTest {
 //    @Inject
 //    private Provider<JdbcTemplate> jdbcTemplateProvider;

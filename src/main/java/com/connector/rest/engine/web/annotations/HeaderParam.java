@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package com.connector.rest.database.testng;
+package com.connector.rest.engine.web.annotations;
 
-import com.connector.rest.database.annotations.SqlDB;
-import org.testng.annotations.Listeners;
+import java.lang.annotation.*;
 
 /**
- * Created by YongTang on 2015/3/16.
+ * Binds the value of a header parameter to a resource method parameter
  *
  * @author Yong Tang
  * @since 0.4
  */
-@Listeners(TestNGDBInjectionListener.class)
-@SqlDB(url = "111", userName = "222", password = "333")
-public abstract class AbstractGuiceTest {
+@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface HeaderParam {
+
+    /**
+     * Header parameter name
+     */
+    String value();
 }
