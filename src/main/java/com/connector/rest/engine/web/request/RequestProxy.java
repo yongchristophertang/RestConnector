@@ -22,6 +22,8 @@ import com.connector.rest.engine.web.http.MultipartBodyFormBuilder;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -42,7 +44,28 @@ import static com.connector.rest.engine.AssertUtils.notNull;
  */
 public final class RequestProxy implements InvocationHandler {
     private static final RequestProxy INSTANCE = new RequestProxy();
+    /**
+     * Use the reflected constructor to initialize a {@link java.lang.invoke.MethodHandles.Lookup} in order to
+     * disable the access check with method {@link java.lang.invoke.MethodHandles.Lookup#in} which prevents access to
+     * "default" methods if the caller class, {@link com.connector.rest.engine.web.request.RequestProxy} in this
+     * case, and the {@code requestLookupClass} do not reside in the same package.
+     */
+    private static final Constructor<MethodHandles.Lookup> LOOKUP_CONSTRUCTOR;
 
+    static {
+        try {
+            LOOKUP_CONSTRUCTOR = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+            if (!LOOKUP_CONSTRUCTOR.isAccessible()) {
+                LOOKUP_CONSTRUCTOR.setAccessible(true);
+            }
+        } catch (NoSuchMethodException exp) {
+            throw new IllegalStateException(exp);
+        }
+    }
+
+    /**
+     * Disable direct initialization
+     */
     private RequestProxy() {
     }
 
@@ -56,6 +79,12 @@ public final class RequestProxy implements InvocationHandler {
     // TODO: too messy, need to refactor
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // if the method is a default method, process with the default implementation
+        if (method.isDefault()) {
+            return LOOKUP_CONSTRUCTOR.newInstance(method.getDeclaringClass(), MethodHandles.Lookup.PRIVATE)
+                    .unreflectSpecial(method, method.getDeclaringClass()).bindTo(proxy).invokeWithArguments(args);
+        }
+
         Map<String, String> queryParams = new HashMap<>();
         Map<String, String> bodyParams = new HashMap<>();
         Map<String, String> pathParams = new HashMap<>();
@@ -136,7 +165,7 @@ public final class RequestProxy implements InvocationHandler {
             pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
             queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
             bodyParams.keySet().stream().forEach(key -> builders.body(key, bodyParams.get(key)));
-            headerParams.keySet().stream().forEach(key->builders.header(key, headerParams.get(key)));
+            headerParams.keySet().stream().forEach(key -> builders.header(key, headerParams.get(key)));
             Optional.ofNullable(contentType).ifPresent(builders::contentType);
             Optional.ofNullable(accept).ifPresent(builders::accept);
             return builders;
@@ -144,7 +173,7 @@ public final class RequestProxy implements InvocationHandler {
             HttpMultipartRequestBuilders builders = new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), url);
             pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
             queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
-            headerParams.keySet().stream().forEach(key->builders.header(key, headerParams.get(key)));
+            headerParams.keySet().stream().forEach(key -> builders.header(key, headerParams.get(key)));
             bodyParams.keySet().stream()
                     .forEach(key -> builders.body(MultipartBodyFormBuilder.create().param(key, bodyParams.get(key))));
             fileParams.keySet().stream().forEach(key -> builders.body(

@@ -49,4 +49,8 @@ public interface TestAPI {
     @Path("/areas")
     @GET
     public RequestBuilder getAreas();
+
+    public default RequestBuilder testDefaultMethod() {
+        return getBooks("123");
+    }
 }

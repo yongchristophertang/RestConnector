@@ -45,4 +45,10 @@ public class EpdResDemoTest {
                 .andExpect(jsonPath("$.code", is("10004040"))).andTransform(json().object(Object.class));
 //        System.out.println(mongoTemplate);
     }
+
+    @Test
+    public void testDefaultMethod() throws Exception {
+        WebTemplate webTemplate = WebTemplateBuilder.defaultConfig().build();
+        webTemplate.perform(api(TestAPI.class).testDefaultMethod()).andDo(print());
+    }
 }
