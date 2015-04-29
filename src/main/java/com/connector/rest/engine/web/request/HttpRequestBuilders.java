@@ -120,6 +120,7 @@ public class HttpRequestBuilders implements RequestBuilder {
         Objects.requireNonNull(value, "path replacement must not be null");
 
         uriTemplate = uriTemplate.replaceAll("\\$\\{" + name + "\\}", value);
+        uriTemplate = uriTemplate.replaceAll("\\{" + name + "\\}", value);
         return this;
     }
 
