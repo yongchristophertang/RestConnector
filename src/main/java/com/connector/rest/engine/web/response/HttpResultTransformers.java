@@ -32,6 +32,13 @@ public abstract class HttpResultTransformers {
     }
 
     /**
+     * Access to transformation of json result with result of parsed json string designated by expression
+     */
+    public static JsonResultTransformer json(String expression) {
+        return new JsonResultTransformer(expression);
+    }
+
+    /**
      * Access to transformation of xml result
      */
     public static XmlResultTransformer xml() {

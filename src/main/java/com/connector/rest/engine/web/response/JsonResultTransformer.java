@@ -35,10 +35,16 @@ import java.util.Map;
  */
 public class JsonResultTransformer {
 
+    private String expression = null;
+
     /**
      * Accessed via {@link HttpResultTransformers#json}
      */
     protected JsonResultTransformer() {
+    }
+
+    protected JsonResultTransformer(String expression) {
+        this.expression = expression;
     }
 
     /**
@@ -66,7 +72,9 @@ public class JsonResultTransformer {
         return result -> {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return mapper.readValue(result.getResponseStringContent(), clazz);
+            return expression == null ? mapper.readValue(result.getResponseStringContent(), clazz) :
+                    mapper.readValue(JsonPath.compile(expression).read(result.getResponseStringContent()).toString(),
+                            clazz);
         };
     }
 
@@ -79,8 +87,12 @@ public class JsonResultTransformer {
         return result -> {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return mapper.readValue(result.getResponseStringContent(), TypeFactory.defaultInstance()
-                    .constructCollectionType(List.class, clazz));
+            return expression == null ?
+                    mapper.readValue(result.getResponseStringContent(), TypeFactory.defaultInstance()
+                            .constructCollectionType(List.class, clazz)) :
+                    mapper.readValue(JsonPath.compile(expression).read(result.getResponseStringContent()).toString(),
+                            TypeFactory.defaultInstance()
+                                    .constructCollectionType(List.class, clazz));
         };
     }
 
@@ -94,8 +106,10 @@ public class JsonResultTransformer {
         return result -> {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return mapper.readValue(result.getResponseStringContent(),
-                    TypeFactory.defaultInstance().constructMapLikeType(Map.class, keyClass, valueClass));
+            return expression == null ? mapper.readValue(result.getResponseStringContent(),
+                    TypeFactory.defaultInstance().constructMapLikeType(Map.class, keyClass, valueClass)) :
+                    mapper.readValue(JsonPath.compile(expression).read(result.getResponseStringContent()).toString(),
+                            TypeFactory.defaultInstance().constructMapLikeType(Map.class, keyClass, valueClass));
         };
     }
 }
