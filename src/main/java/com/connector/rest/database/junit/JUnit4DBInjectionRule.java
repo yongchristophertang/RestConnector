@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A JUnit4 {@link org.junit.Rule} to inject DB related handlers {@link org.springframework.jdbc.core.JdbcTemplate}
- * and {@link org.springframework.data.mongodb.core.MongoTemplate} from the annotations {@link com.connector.rest
+ * A JUnit4 {@link org.junit.Rule} to inject DB related handlers {@link javax.sql.DataSource}
+ * and {@link com.mongodb.MongoClient} from the annotations {@link com.connector.rest
  * .database.annotations.SqlDB} and {@link com.connector.rest.database.annotations.Mongo} marked on the test class
  * and its superclasses.
  * <p/>

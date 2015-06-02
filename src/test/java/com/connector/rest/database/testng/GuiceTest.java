@@ -16,6 +16,7 @@
 
 package com.connector.rest.database.testng;
 
+import com.connector.rest.config.Property;
 import com.connector.rest.database.annotations.SqlDB;
 import com.google.inject.Inject;
 import org.testng.annotations.BeforeClass;
@@ -36,12 +37,12 @@ public class GuiceTest extends AbstractGuiceTest {
 //    @Inject
 //    private Provider<JdbcTemplate> jdbcTemplateProvider;
 
+    @Property("http.port")
+    public String httpPort;
     @Inject
     private DataSource dataSource;
-
     @Inject
     private DataSource dataSource2;
-
 
     @BeforeClass
     private void setUp() {
@@ -53,6 +54,9 @@ public class GuiceTest extends AbstractGuiceTest {
     private void testDemo() {
         System.out.println(dataSource);
         System.out.println(dataSource2);
+
+        System.out.println(httpPort);
+        System.out.println(httpHost);
     }
 
     @Test

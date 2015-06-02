@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package com.connector.rest.database.testng;
+package com.connector.rest.config.testng;
 
 import com.connector.rest.config.Property;
 import com.connector.rest.config.PropertyConfig;
-import com.connector.rest.config.testng.TestNGPropertyInjectionListener;
-import com.connector.rest.database.annotations.SqlDB;
 import org.testng.annotations.Listeners;
 
 /**
- * Created by YongTang on 2015/3/16.
+ * Created by YongTang on 2015/6/2.
  *
  * @author Yong Tang
- * @since 0.4
+ * @since 1.0
  */
-@Listeners(value = {TestNGDBInjectionListener.class, TestNGPropertyInjectionListener.class})
-@SqlDB(url = "111", userName = "222", password = "333")
+@Listeners(TestNGPropertyInjectionListener.class)
 @PropertyConfig("http_config.properties")
-public abstract class AbstractGuiceTest {
-    @Property("http.host")
-    public String httpHost;
+public abstract class AbstractPropertyInjectionTest {
+    @Property("http.test")
+    public String httpTest;
 }

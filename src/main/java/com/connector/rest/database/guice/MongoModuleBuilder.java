@@ -50,7 +50,7 @@ public class MongoModuleBuilder extends DBAnnotationModuleBuilder {
             }
 
             @Provides
-            MongoClient provideMontoTemplate(ClientFactory<MongoClient> factory) {
+            MongoClient provideMongoTemplate(ClientFactory<MongoClient> factory) {
                 return factory.buildClients().poll();
             }
         };

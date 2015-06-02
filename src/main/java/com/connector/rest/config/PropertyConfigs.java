@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package com.connector.rest.database.testng;
+package com.connector.rest.config;
 
-import com.connector.rest.config.Property;
-import com.connector.rest.config.PropertyConfig;
-import com.connector.rest.config.testng.TestNGPropertyInjectionListener;
-import com.connector.rest.database.annotations.SqlDB;
-import org.testng.annotations.Listeners;
+import java.lang.annotation.*;
 
 /**
- * Created by YongTang on 2015/3/16.
+ * Holders for repeatable {@link PropertyConfig}
  *
  * @author Yong Tang
  * @since 0.4
  */
-@Listeners(value = {TestNGDBInjectionListener.class, TestNGPropertyInjectionListener.class})
-@SqlDB(url = "111", userName = "222", password = "333")
-@PropertyConfig("http_config.properties")
-public abstract class AbstractGuiceTest {
-    @Property("http.host")
-    public String httpHost;
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
+public @interface PropertyConfigs {
+    PropertyConfig[] value();
 }
