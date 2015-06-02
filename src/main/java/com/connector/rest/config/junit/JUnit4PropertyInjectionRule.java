@@ -14,32 +14,27 @@
  * limitations under the License.
  */
 
-package com.connector.rest.config.testng;
+package com.connector.rest.config.junit;
 
 import com.connector.rest.config.PropertyHandler;
-import org.testng.ITestClass;
-import org.testng.ITestContext;
-import org.testng.ITestNGMethod;
-import org.testng.TestListenerAdapter;
+import org.junit.rules.MethodRule;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 
 /**
- * TestNG listener for property injection
+ * JUnit4 Rule for property injection.
  *
  * @author Yong Tang
  * @since 1.0
  */
-public class TestNGPropertyInjectionListener extends TestListenerAdapter {
+public class JUnit4PropertyInjectionRule implements MethodRule {
+    /**
+     * The rule that is about to load properties from {@link com.connector.rest.config.PropertyConfig}s and set values
+     * to {@link com.connector.rest.config.Property}s.
+     */
     @Override
-    public void onStart(ITestContext context) {
-        super.onStart(context);
-
-        ITestNGMethod[] methods = context.getAllTestMethods();
-        if (methods.length < 1) {
-            return;
-        }
-        ITestClass testClass = methods[0].getTestClass();
-        Object[] testInstances = testClass.getInstances(true);
-
-        PropertyHandler.loadProperties(testClass.getRealClass(), testInstances);
+    public Statement apply(Statement base, FrameworkMethod method, Object target) {
+        PropertyHandler.loadProperties(method.getDeclaringClass(), new Object[]{target});
+        return base;
     }
 }
