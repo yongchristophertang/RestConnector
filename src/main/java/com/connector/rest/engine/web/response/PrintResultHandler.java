@@ -52,10 +52,10 @@ public class PrintResultHandler implements ResultHandler {
         RequestLine rl = result.getHttpRequest().getRequestLine();
         logger.info("Request URI: " + rl);
         if (rl.getMethod().equals("POST") || rl.getMethod().equals("PUT") || rl.getMethod().equals("PATCH")) {
-            if (result.getHttpRequest() instanceof HttpEntityEnclosingRequest) {
+            try {
                 logger.info("Request Body: " +
                         EntityUtils.toString(((HttpEntityEnclosingRequest) result.getHttpRequest()).getEntity()));
-            } else {
+            } catch (UnsupportedOperationException e){
                 logger.info("Request Body: " + "Multipart Body Cannot Be Displayed.");
             }
         }

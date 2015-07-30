@@ -174,12 +174,14 @@ public final class RequestProxy implements InvocationHandler {
             pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
             queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
             headerParams.keySet().stream().forEach(key -> builders.header(key, headerParams.get(key)));
-            bodyParams.keySet().stream()
-                    .forEach(key -> builders.body(MultipartBodyFormBuilder.create().param(key, bodyParams.get(key))));
-            fileParams.keySet().stream().forEach(key -> builders.body(
-                    MultipartBodyFormBuilder.create().file(key, bodyParams.get(key))));
-            Optional.ofNullable(contentType).ifPresent(builders::contentType);
+
+            // Create an MultipartBodyFormBuilder
+            MultipartBodyFormBuilder multipartBodyFormBuilder = MultipartBodyFormBuilder.create();
+            bodyParams.keySet().stream().forEach(key -> multipartBodyFormBuilder.param(key, bodyParams.get(key)));
+            fileParams.keySet().stream().forEach(key -> multipartBodyFormBuilder.file(key, fileParams.get(key)));
+//            Optional.ofNullable(contentType).ifPresent(builders::contentType);
             Optional.ofNullable(accept).ifPresent(builders::accept);
+            builders.body(multipartBodyFormBuilder);
             return builders;
         }
     }

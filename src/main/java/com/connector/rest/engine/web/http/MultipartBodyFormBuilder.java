@@ -17,6 +17,7 @@
 package com.connector.rest.engine.web.http;
 
 import com.connector.rest.engine.AssertUtils;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 
@@ -49,7 +50,7 @@ public class MultipartBodyFormBuilder implements FormBuilder {
      */
     public MultipartBodyFormBuilder param(String name, String value) {
         AssertUtils.notNull(name, "Parameter name must not be null.");
-        Optional.ofNullable(value).ifPresent(v -> builder.addTextBody(name, v));
+        Optional.ofNullable(value).ifPresent(v -> builder.addTextBody(name, v, ContentType.TEXT_PLAIN));
         return this;
     }
 
