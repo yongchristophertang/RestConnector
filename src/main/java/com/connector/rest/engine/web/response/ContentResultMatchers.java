@@ -17,8 +17,13 @@
 package com.connector.rest.engine.web.response;
 
 import com.connector.rest.engine.web.ResultMatcher;
+import org.apache.http.Header;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 
@@ -58,4 +63,22 @@ public class ContentResultMatchers {
         return string(is(content));
     }
 
+
+    /**
+     * Assert all the response headers for the {@code headerName}.
+     */
+    public ResultMatcher headers(String headerName, final Matcher<? super List<String>> matcher) {
+        return result -> MatcherAssert
+                .assertThat("Header content of " + headerName,
+                        Arrays.asList(result.getHttpResponse().getHeaders(headerName)).stream().map(Header::getValue)
+                                .collect(Collectors.toList()), matcher);
+    }
+
+    /**
+     * Assert the first response header for the {@code headerName}.
+     */
+    public ResultMatcher header(String headerName, final Matcher<? super String> matcher) {
+        return result -> MatcherAssert.assertThat("Header content of " + headerName,
+                result.getHttpResponse().getFirstHeader(headerName).getValue(), matcher);
+    }
 }
