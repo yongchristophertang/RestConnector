@@ -20,7 +20,12 @@ import com.connector.rest.config.Property;
 import com.connector.rest.config.PropertyConfig;
 import com.connector.rest.config.testng.TestNGPropertyInjectionListener;
 import com.connector.rest.database.annotations.SqlDB;
+import com.google.inject.Inject;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Listeners;
+
+import javax.sql.DataSource;
 
 /**
  * Created by YongTang on 2015/3/16.
@@ -28,10 +33,17 @@ import org.testng.annotations.Listeners;
  * @author Yong Tang
  * @since 0.4
  */
-@Listeners(value = {TestNGDBInjectionListener.class, TestNGPropertyInjectionListener.class})
+@Guice(moduleFactory = TestNGDBInjectionModuleFactory.class)
 @SqlDB(url = "111", userName = "222", password = "333")
-@PropertyConfig("http_config.properties")
+//@PropertyConfig("http_config.properties")
 public abstract class AbstractGuiceTest {
-    @Property("http.host")
-    public String httpHost;
+//    @Property("http.host")
+//    public String httpHost;
+    @Inject
+    protected DataSource dataSource0;
+
+    @BeforeClass
+    public void setUp0() {
+        System.out.println(dataSource0);
+    }
 }

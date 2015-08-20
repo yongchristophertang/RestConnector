@@ -16,6 +16,9 @@
 
 package com.connector.rest.engine.web.annotations;
 
+import com.connector.rest.engine.web.request.SimpleStringConverter;
+import com.connector.rest.engine.web.request.StringConverter;
+
 import java.lang.annotation.*;
 
 /**
@@ -32,4 +35,9 @@ public @interface BodyParam {
      * Body form parameter name.
      */
     String value() default "";
+
+    /**
+     * Converter for transferring parameter object into body string.
+     */
+    Class<? extends StringConverter> converter() default SimpleStringConverter.class;
 }

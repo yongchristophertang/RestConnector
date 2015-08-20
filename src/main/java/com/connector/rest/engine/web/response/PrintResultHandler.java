@@ -55,8 +55,10 @@ public class PrintResultHandler implements ResultHandler {
             try {
                 logger.info("Request Body: " +
                         EntityUtils.toString(((HttpEntityEnclosingRequest) result.getHttpRequest()).getEntity()));
-            } catch (UnsupportedOperationException e){
+            } catch (UnsupportedOperationException e) {
                 logger.info("Request Body: " + "Multipart Body Cannot Be Displayed.");
+            } catch (IllegalArgumentException e) {
+                logger.info("No Request Body.");
             }
         }
         logger.info("Request Headers: " + Lists.newArrayList(result.getHttpRequest().getAllHeaders()));

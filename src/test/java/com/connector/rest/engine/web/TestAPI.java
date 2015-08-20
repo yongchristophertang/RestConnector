@@ -17,6 +17,7 @@
 package com.connector.rest.engine.web;
 
 import com.connector.rest.engine.web.annotations.*;
+import com.connector.rest.engine.web.request.JsonStringConverter;
 import com.connector.rest.engine.web.request.RequestBuilder;
 
 /**
@@ -46,6 +47,10 @@ public interface TestAPI {
     @Consume("application/json")
     public RequestBuilder postGrade(@BodyParam String id);
 
+    @POST
+    @Path("/test")
+    RequestBuilder postTester(@BodyParam(value = "tester", converter = JsonStringConverter.class) Tester tester);
+
     @Path("/areas")
     @GET
     public RequestBuilder getAreas();
@@ -53,4 +58,8 @@ public interface TestAPI {
     public default RequestBuilder testDefaultMethod() {
         return getBooks("123");
     }
+
+    @Path("/files")
+    @POST
+    RequestBuilder uploadFile(@BodyParam("test") String test, @FileParam("file") String filePath);
 }

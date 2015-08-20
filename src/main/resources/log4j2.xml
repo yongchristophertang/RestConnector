@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<Configuration strict="true" packages="com.github.connector.log4j">
+<Configuration strict="true" packages="com.connector.rest.log4j">
 	<Appenders>
 		<Console name="STDOUT">
 			<PatternLayout>
@@ -29,7 +29,7 @@
 	</Appenders>
 
 	<Loggers>
-		<logger name="com.github.connector" level="info" additivity="false">
+		<logger name="com.connector.rest" level="info" additivity="false">
 			<AppenderRef ref="app" />
 			<AppenderRef ref="STDOUT" />
 		</logger>

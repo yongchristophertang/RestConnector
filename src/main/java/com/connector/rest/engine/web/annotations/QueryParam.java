@@ -16,6 +16,9 @@
 
 package com.connector.rest.engine.web.annotations;
 
+import com.connector.rest.engine.web.request.SimpleStringConverter;
+import com.connector.rest.engine.web.request.StringConverter;
+
 import java.lang.annotation.*;
 
 /**
@@ -33,4 +36,9 @@ public @interface QueryParam {
      * Query parameter name
      */
     String value();
+
+    /**
+     * Converter for transferring query paramter object into query string.
+     */
+    Class<? extends StringConverter> converter() default SimpleStringConverter.class;
 }

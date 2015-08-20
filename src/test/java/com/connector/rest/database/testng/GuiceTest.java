@@ -23,6 +23,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 
 /**
  * Created by YongTang on 2015/3/16.
@@ -37,6 +38,7 @@ public class GuiceTest extends AbstractGuiceTest {
 //    @Inject
 //    private Provider<JdbcTemplate> jdbcTemplateProvider;
 
+
     @Property("http.port")
     public String httpPort;
     @Inject
@@ -49,14 +51,13 @@ public class GuiceTest extends AbstractGuiceTest {
 //        jdbcTemplate = jdbcTemplateProvider.get();
 //        jdbcTemplate = jdbcTemplateProvider.get();
     }
-
-    @Test
-    private void testDemo() {
+@Test
+    private void testDemo() throws SQLException {
         System.out.println(dataSource);
         System.out.println(dataSource2);
-
+        dataSource.getConnection();
         System.out.println(httpPort);
-        System.out.println(httpHost);
+//        System.out.println(httpHost);
     }
 
     @Test

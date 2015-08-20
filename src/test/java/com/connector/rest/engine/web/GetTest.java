@@ -33,12 +33,24 @@ public class GetTest {
 
     @Before
     public void setUp() {
-        WebTemplate webTemplate = WebTemplateBuilder.defaultConfig().build();
+        webTemplate = WebTemplateBuilder.defaultConfig().build();
     }
 
     @Test
     public void testDemo() throws Exception {
-        webTemplate = WebTemplateBuilder.defaultConfig().build();
         webTemplate.perform(api(TestAPI.class).postGrade("{\"engine\":123}")).andDo(print());
+    }
+
+    @Test
+    public void testDemo2() throws Exception {
+        webTemplate.perform(api(TestAPI.class).uploadFile("name", "")).andDo(print());
+    }
+
+    @Test
+    public void testDemo3() throws Exception {
+        Tester tester = new Tester();
+        tester.setId(100);
+//        tester.setName("tester");
+        webTemplate.perform(api(TestAPI.class).postTester(tester)).andDo(print());
     }
 }

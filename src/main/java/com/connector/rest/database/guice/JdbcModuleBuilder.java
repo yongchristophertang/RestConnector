@@ -49,7 +49,7 @@ public class JdbcModuleBuilder extends DBAnnotationModuleBuilder {
             }
 
             @Provides
-            DataSource provideJdbcTemplate(ClientFactory<DataSource> factory) {
+            DataSource provideJdbcDataSource(ClientFactory<DataSource> factory) {
                 return factory.buildClients().poll();
             }
         };
