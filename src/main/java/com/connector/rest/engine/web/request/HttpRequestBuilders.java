@@ -20,16 +20,17 @@ import com.google.common.collect.Lists;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -49,12 +50,14 @@ public class HttpRequestBuilders implements RequestBuilder {
 
     private final List<Header> headers = new ArrayList<>();
     private final List<NameValuePair> parameters = new ArrayList<>();
+    private final List<NameValuePair> bodyParameters = new ArrayList<>();
     private final List<Cookie> cookies = new ArrayList<>();
 
     private final List<RequestPostProcessor> postProcessors = new ArrayList<>();
     private HttpRequest httpRequest;
     private String uriTemplate;
-    private byte[] content;
+    private byte[] bytesContent;
+    private String stringContent;
     private Locale locale;
     private String characterEncoding;
 
@@ -83,15 +86,21 @@ public class HttpRequestBuilders implements RequestBuilder {
      * {@inheritDoc}
      */
     @Override
-    public HttpRequest buildRequest() throws URISyntaxException {
+    public HttpRequest buildRequest() throws Exception {
         URIBuilder builder = new URIBuilder(uriTemplate);
         builder.addParameters(parameters);
         Header[] heads = new Header[headers.size()];
         httpRequest.setHeaders(headers.toArray(heads));
         ((HttpRequestBase) httpRequest).setURI(builder.build());
         postProcessors.stream().forEach(p -> httpRequest = p.postProcessRequest(httpRequest));
-        if (content != null && content.length > 0) {
-            ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new ByteArrayEntity(content));
+
+        // The priorities for each content type are bytesContent > stringContent > bodyParameters
+        if (bytesContent != null && bytesContent.length > 0) {
+            ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new ByteArrayEntity(bytesContent));
+        } else if (stringContent != null && stringContent.length() > 0) {
+            ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new StringEntity(stringContent, "UTF-8"));
+        } else if (bodyParameters.size() > 0) {
+            ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new UrlEncodedFormEntity(bodyParameters, "UTF-8"));
         }
         return httpRequest;
     }
@@ -140,7 +149,7 @@ public class HttpRequestBuilders implements RequestBuilder {
     /**
      * Set the 'Content-Type' header of the request.
      *
-     * @param contentType the content type
+     * @param contentType the bytesContent type
      */
     public HttpRequestBuilders contentType(String contentType) {
         Objects.requireNonNull(contentType, "contentType must not be null");
@@ -162,26 +171,32 @@ public class HttpRequestBuilders implements RequestBuilder {
 
     /**
      * Set the request body.
+     * IMPORTANT: the body form set by this method will overwrite the content. This method can only be accessed by
+     * explicit calling, but not in the {@link TestRequestBuilders#api(Class)}.
      *
-     * @param content the body content
+     * @param content the body bytesContent
      */
     public HttpRequestBuilders body(byte[] content) {
-        this.content = content;
+        this.bytesContent = content;
         return this;
     }
 
     /**
      * Set the request body.
+     * IMPORTANT: the body form set by this method will be shadowed by {@link #body(byte[])} and reset content set by
+     * {@link #body(String, String)}.
      *
-     * @param content the body content
+     * @param content the body bytesContent
      */
     public HttpRequestBuilders body(String content) throws UnsupportedEncodingException {
-        content = URLEncoder.encode(content, "UTF-8");
-        return body(content.getBytes());
+        stringContent = URLEncoder.encode(content, "UTF-8");
+        return this;
     }
 
     /**
      * Set the request body form.
+     * IMPORTANT: the body form set by this method will be shadowed by {@link #body(byte[])} or {@link #body(String)},
+     * this method has the lowest priority.
      *
      * @param param the body form parameter
      * @param value the body form value
@@ -193,18 +208,9 @@ public class HttpRequestBuilders implements RequestBuilder {
         try {
             param = URLEncoder.encode(param, "UTF-8");
             value = URLEncoder.encode(value, "UTF-8");
+            bodyParameters.add(new BasicNameValuePair(param, value));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        }
-
-        if (content != null && content.length > 0) {
-            content = (new String(content) + "&" + param + "=" + value).getBytes();
-        } else {
-            if (param.equals("")) {
-                return body(value.getBytes());
-            } else {
-                content = (param + "=" + value).getBytes();
-            }
         }
         return this;
     }

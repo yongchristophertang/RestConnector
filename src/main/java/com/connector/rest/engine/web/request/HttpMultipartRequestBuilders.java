@@ -54,7 +54,7 @@ public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
      * {@inheritDoc}
      */
     @Override
-    public HttpRequestBase buildRequest() throws URISyntaxException {
+    public HttpRequestBase buildRequest() throws Exception {
         HttpEntityEnclosingRequestBase requestBase = (HttpEntityEnclosingRequestBase) super.buildRequest();
         requestBase.setEntity(httpEntity);
         return requestBase;

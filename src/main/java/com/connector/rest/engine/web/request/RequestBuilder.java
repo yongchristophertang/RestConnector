@@ -27,5 +27,5 @@ import java.net.URISyntaxException;
  * @since 0.4
  */
 public interface RequestBuilder {
-    public HttpRequest buildRequest() throws URISyntaxException;
+    public HttpRequest buildRequest() throws Exception;
 }

@@ -58,7 +58,7 @@ public class PrintResultHandler implements ResultHandler {
             } catch (UnsupportedOperationException e) {
                 logger.info("Request Body: " + "Multipart Body Cannot Be Displayed.");
             } catch (IllegalArgumentException e) {
-                logger.info("No Request Body.");
+                logger.info("Request Body: None");
             }
         }
         logger.info("Request Headers: " + Lists.newArrayList(result.getHttpRequest().getAllHeaders()));

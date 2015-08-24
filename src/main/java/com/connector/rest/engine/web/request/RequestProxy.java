@@ -24,6 +24,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -109,7 +110,8 @@ public final class RequestProxy implements InvocationHandler {
         }).forEach(f -> {
             try {
                 if (f.isAnnotationPresent(PathParam.class)) {
-                    pathParams.put(f.getAnnotation(PathParam.class).value(), String.valueOf(f.get(null)));
+                    StringConverter converter = f.getAnnotation(PathParam.class).converter().newInstance();
+                    pathParams.put(f.getAnnotation(PathParam.class).value(), converter.convert(f.get(null)));
                 } else if (f.isAnnotationPresent(BodyParam.class)) {
                     StringConverter converter = f.getAnnotation(BodyParam.class).converter().newInstance();
                     bodyParams.put(f.getAnnotation(BodyParam.class).value(), converter.convert(f.get(null)));
@@ -154,7 +156,8 @@ public final class RequestProxy implements InvocationHandler {
             }
             try {
                 if (p.isAnnotationPresent(PathParam.class)) {
-                    pathParams.put(p.getAnnotation(PathParam.class).value(), args[i].toString());
+                    StringConverter converter = p.getAnnotation(PathParam.class).converter().newInstance();
+                    pathParams.put(p.getAnnotation(PathParam.class).value(), converter.convert(args[i]));
                 } else if (p.isAnnotationPresent(BodyParam.class)) {
                     StringConverter converter = p.getAnnotation(BodyParam.class).converter().newInstance();
                     bodyParams.put(p.getAnnotation(BodyParam.class).value(), converter.convert(args[i]));
@@ -176,7 +179,17 @@ public final class RequestProxy implements InvocationHandler {
             HttpRequestBuilders builders = new HttpRequestBuilders(httpMethod.getHttpRequest(), url);
             pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
             queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
-            bodyParams.keySet().stream().forEach(key -> builders.body(key, bodyParams.get(key)));
+            bodyParams.keySet().stream().forEach(key -> {
+                if (key.equals("")) {
+                    try {
+                        builders.body(bodyParams.get(key));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    builders.body(key, bodyParams.get(key));
+                }
+            });
             headerParams.keySet().stream().forEach(key -> builders.header(key, headerParams.get(key)));
             Optional.ofNullable(contentType).ifPresent(builders::contentType);
             Optional.ofNullable(accept).ifPresent(builders::accept);

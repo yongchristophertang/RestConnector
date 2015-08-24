@@ -16,6 +16,9 @@
 
 package com.connector.rest.engine.web.annotations;
 
+import com.connector.rest.engine.web.request.SimpleStringConverter;
+import com.connector.rest.engine.web.request.StringConverter;
+
 import java.lang.annotation.*;
 
 /**
@@ -32,4 +35,9 @@ public @interface PathParam {
      * Path parameter name
      */
     String value();
+
+    /**
+     * Converter for transferring path paramter object into path string.
+     */
+    Class<? extends StringConverter> converter() default SimpleStringConverter.class;
 }
