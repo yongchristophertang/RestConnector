@@ -188,8 +188,8 @@ public class HttpRequestBuilders implements RequestBuilder {
      *
      * @param content the body bytesContent
      */
-    public HttpRequestBuilders body(String content) throws UnsupportedEncodingException {
-        stringContent = URLEncoder.encode(content, "UTF-8");
+    public HttpRequestBuilders body(String content) {
+        stringContent = content;
         return this;
     }
 
@@ -205,13 +205,7 @@ public class HttpRequestBuilders implements RequestBuilder {
         notNull(param, "Parameter must not be null");
         stringNotBlank(value, "Value must not be blank");
 
-        try {
-            param = URLEncoder.encode(param, "UTF-8");
-            value = URLEncoder.encode(value, "UTF-8");
-            bodyParameters.add(new BasicNameValuePair(param, value));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        bodyParameters.add(new BasicNameValuePair(param, value));
         return this;
     }
 

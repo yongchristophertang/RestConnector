@@ -40,4 +40,9 @@ public @interface BodyParam {
      * Converter for transferring parameter object into body string.
      */
     Class<? extends StringConverter> converter() default SimpleStringConverter.class;
+
+    /**
+     * Encoding of this body form parameter.
+     */
+    String encoding() default "UTF-8";
 }

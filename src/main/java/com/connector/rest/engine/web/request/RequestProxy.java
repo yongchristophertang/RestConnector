@@ -24,7 +24,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -181,11 +180,7 @@ public final class RequestProxy implements InvocationHandler {
             queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
             bodyParams.keySet().stream().forEach(key -> {
                 if (key.equals("")) {
-                    try {
-                        builders.body(bodyParams.get(key));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                    builders.body(bodyParams.get(key));
                 } else {
                     builders.body(key, bodyParams.get(key));
                 }
@@ -240,6 +235,9 @@ public final class RequestProxy implements InvocationHandler {
     }
 
     private String getPath(Path path) {
+        if (path == null) {
+            return "";
+        }
         String p = path.value();
         return removeTrailingSlash(p.length() > 0 ? (p.startsWith("/") ? p : "/" + p) : "");
     }

@@ -18,6 +18,8 @@ package com.connector.rest.engine.web.response;
 
 import com.connector.rest.engine.web.ResultActions;
 import com.connector.rest.engine.web.ResultTransform;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -72,9 +74,15 @@ public class JsonResultTransformer {
         return result -> {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return expression == null ? mapper.readValue(result.getResponseStringContent(), clazz) :
-                    mapper.readValue(JsonPath.compile(expression).read(result.getResponseStringContent()).toString(),
-                            clazz);
+            mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+            try {
+                return expression == null ? mapper.readValue(result.getResponseStringContent(), clazz) :
+                        mapper.readValue(
+                                JsonPath.compile(expression).read(result.getResponseStringContent()).toString(),
+                                clazz);
+            } catch (JsonParseException e) {
+                return clazz.cast(JsonPath.compile(expression).read(result.getResponseStringContent()));
+            }
         };
     }
 

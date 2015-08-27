@@ -26,6 +26,8 @@ import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.net.URLDecoder;
+
 /**
  * An implementation of {@link com.connector.rest.engine.web.ResultHandler} for performing print task
  *
@@ -53,8 +55,10 @@ public class PrintResultHandler implements ResultHandler {
         logger.info("Request URI: " + rl);
         if (rl.getMethod().equals("POST") || rl.getMethod().equals("PUT") || rl.getMethod().equals("PATCH")) {
             try {
-                logger.info("Request Body: " +
-                        EntityUtils.toString(((HttpEntityEnclosingRequest) result.getHttpRequest()).getEntity()));
+                logger.info("Request Body (URL Decoded): " +
+                        URLDecoder.decode(EntityUtils
+                                .toString(((HttpEntityEnclosingRequest) result.getHttpRequest()).getEntity()),
+                                "UTF-8"));
             } catch (UnsupportedOperationException e) {
                 logger.info("Request Body: " + "Multipart Body Cannot Be Displayed.");
             } catch (IllegalArgumentException e) {
