@@ -78,7 +78,7 @@ public final class RequestProxy implements InvocationHandler {
         return INSTANCE;
     }
 
-    // TODO: too messy, need to refactor
+    // TODO: too messy, need to refactor data collection part
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // if the method is a default method, process with the default implementation
@@ -92,8 +92,8 @@ public final class RequestProxy implements InvocationHandler {
         Map<String, String> pathParams = new HashMap<>();
         Multimap<String, String> fileParams = ArrayListMultimap.create();
         Map<String, String> headerParams = new HashMap<>();
-        String contentType = null;
-        String accept = null;
+        String contentType;
+        String accept;
 
         String url = getHost(method.getDeclaringClass().getAnnotation(Host.class));
         url += getPath(method.getDeclaringClass().getAnnotation(Path.class)) +
@@ -127,14 +127,10 @@ public final class RequestProxy implements InvocationHandler {
         });
 
         Produce produce = method.getAnnotation(Produce.class);
-        if (produce != null) {
-            contentType = produce.value();
-        }
+        contentType = produce != null ? produce.value() : null;
 
         Consume consume = method.getAnnotation(Consume.class);
-        if (consume != null) {
-            accept = consume.value();
-        }
+        accept = consume != null ? consume.value() : null;
 
         List<HTTPMethod> httpMethods = Lists.newArrayList(method.getAnnotations()).stream()
                 .map(a -> a.annotationType().getAnnotation(HTTPMethod.class)).filter(m -> m != null).collect(
@@ -174,45 +170,119 @@ public final class RequestProxy implements InvocationHandler {
             }
         });
 
-        if (fileParams.isEmpty()) {
-            HttpRequestBuilders builders = new HttpRequestBuilders(httpMethod.getHttpRequest(), url);
-            pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
-            queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
-            bodyParams.keySet().stream().forEach(key -> {
-                if (key.equals("")) {
-                    builders.body(bodyParams.get(key));
-                } else {
-                    builders.body(key, bodyParams.get(key));
-                }
-            });
-            headerParams.keySet().stream().forEach(key -> builders.header(key, headerParams.get(key)));
-            Optional.ofNullable(contentType).ifPresent(builders::contentType);
-            Optional.ofNullable(accept).ifPresent(builders::accept);
-            return builders;
-        } else {
-            HttpMultipartRequestBuilders builders = new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), url);
-            pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
-            queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
-            headerParams.keySet().stream().forEach(key -> builders.header(key, headerParams.get(key)));
+        abstract class RequestBuilderConstructor {
+            HttpRequestBuilders builders;
 
-            // Create an MultipartBodyFormBuilder
-            MultipartBodyFormBuilder multipartBodyFormBuilder = MultipartBodyFormBuilder.create();
-            bodyParams.keySet().stream().forEach(key -> multipartBodyFormBuilder.param(key, bodyParams.get(key)));
-            fileParams.keySet().stream().forEach(key -> fileParams.get(key).stream().forEach(
-                    value -> {
-                        if (value.contains(",")) {
-                            for (String file : value.split(",")) {
-                                multipartBodyFormBuilder.file(key, file);
-                            }
-                        } else if (!value.isEmpty()) {
-                            multipartBodyFormBuilder.file(key, value);
-                        }
-                    }));
-//            Optional.ofNullable(contentType).ifPresent(builders::contentType);
-            Optional.ofNullable(accept).ifPresent(builders::accept);
-            builders.body(multipartBodyFormBuilder);
-            return builders;
+            void pathBuild() {
+                pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
+            }
+
+            void queryBuild() {
+                queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
+            }
+
+            void headerBuild() {
+                headerParams.keySet().stream().forEach(key -> builders.header(key, headerParams.get(key)));
+            }
+
+            abstract void contentTypeBuild();
+
+            void acceptBuild() {
+                Optional.ofNullable(accept).ifPresent(builders::accept);
+            }
+
+            abstract void bodyBuild();
+
+            abstract void fileBuild();
+
+            abstract void postProcessor();
+
+            final HttpRequestBuilders build() {
+                pathBuild();
+                queryBuild();
+                headerBuild();
+                contentTypeBuild();
+                acceptBuild();
+                bodyBuild();
+                fileBuild();
+                postProcessor();
+                return builders;
+            }
         }
+
+        class MultipartConstructor extends RequestBuilderConstructor {
+            MultipartBodyFormBuilder multipartBodyFormBuilder = MultipartBodyFormBuilder.create();
+
+            MultipartConstructor(HttpMultipartRequestBuilders builders) {
+                this.builders = builders;
+            }
+
+            @Override
+            void contentTypeBuild() {
+
+            }
+
+            @Override
+            void bodyBuild() {
+                bodyParams.keySet().stream().forEach(key -> multipartBodyFormBuilder.param(key, bodyParams.get(key)));
+            }
+
+            @Override
+            void fileBuild() {
+                fileParams.keySet().stream().forEach(key -> fileParams.get(key).stream().forEach(
+                        value -> {
+                            if (value.contains(",")) {
+                                for (String file : value.split(",")) {
+                                    multipartBodyFormBuilder.file(key, file);
+                                }
+                            } else if (!value.isEmpty()) {
+                                multipartBodyFormBuilder.file(key, value);
+                            }
+                        }));
+            }
+
+            @Override
+            void postProcessor() {
+                HttpMultipartRequestBuilders.class.cast(builders).body(multipartBodyFormBuilder);
+            }
+        }
+
+        class RequestConstructor extends RequestBuilderConstructor {
+
+            RequestConstructor(HttpRequestBuilders builders) {
+                this.builders = builders;
+            }
+
+            @Override
+            void contentTypeBuild() {
+                Optional.ofNullable(contentType).ifPresent(builders::contentType);
+            }
+
+            @Override
+            void bodyBuild() {
+                bodyParams.keySet().stream().forEach(key -> {
+                    if (key.equals("")) {
+                        builders.body(bodyParams.get(key));
+                    } else {
+                        builders.body(key, bodyParams.get(key));
+                    }
+                });
+            }
+
+            @Override
+            void fileBuild() {
+
+            }
+
+            @Override
+            void postProcessor() {
+
+            }
+        }
+
+        return fileParams.isEmpty() ?
+                new RequestConstructor(new HttpRequestBuilders(httpMethod.getHttpRequest(), url)).build() :
+                new MultipartConstructor(new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), url)).build();
     }
 
     private String getHost(Host host) throws Exception {
