@@ -170,33 +170,67 @@ public final class RequestProxy implements InvocationHandler {
             }
         });
 
+        /**
+         * Local inner class for creating a {@link HttpRequestBuilders} or {@link HttpMultipartRequestBuilders}.
+         * This class provides a {@code build} method to construct the target {@code builders}.
+         */
         abstract class RequestBuilderConstructor {
             HttpRequestBuilders builders;
 
+            /**
+             * Build path parameters.
+             */
             void pathBuild() {
                 pathParams.keySet().stream().forEach(key -> builders.path(key, pathParams.get(key)));
             }
 
+            /**
+             * Build query string parameters.
+             */
             void queryBuild() {
                 queryParams.keySet().stream().forEach(key -> builders.param(key, queryParams.get(key)));
             }
 
+            /**
+             * Build ordinary header parameters.
+             */
             void headerBuild() {
                 headerParams.keySet().stream().forEach(key -> builders.header(key, headerParams.get(key)));
             }
 
+            /**
+             * Build a special header parameter, ContentType.
+             * The method behaviour varies with different request types..
+             */
             abstract void contentTypeBuild();
 
+            /**
+             * Build a special header parameter, Accept.
+             */
             void acceptBuild() {
                 Optional.ofNullable(accept).ifPresent(builders::accept);
             }
 
+            /**
+             * Build body form parameters.
+             * The method behaviour varies with different request types.
+             */
             abstract void bodyBuild();
 
+            /**
+             * Attach files with requests.
+             * This method is only valid for multipart request type.
+             */
             abstract void fileBuild();
 
+            /**
+             * Post processors for returning {@code builders}
+             */
             abstract void postProcessor();
 
+            /**
+             * Return a {@link HttpRequestBuilders}.
+             */
             final HttpRequestBuilders build() {
                 pathBuild();
                 queryBuild();
@@ -210,6 +244,9 @@ public final class RequestProxy implements InvocationHandler {
             }
         }
 
+        /**
+         * Local inner class for creating a {@link HttpMultipartRequestBuilders}.
+         */
         class MultipartConstructor extends RequestBuilderConstructor {
             MultipartBodyFormBuilder multipartBodyFormBuilder = MultipartBodyFormBuilder.create();
 
@@ -247,6 +284,9 @@ public final class RequestProxy implements InvocationHandler {
             }
         }
 
+        /**
+         * Local inner class for creating a {@link HttpRequestBuilders}.
+         */
         class RequestConstructor extends RequestBuilderConstructor {
 
             RequestConstructor(HttpRequestBuilders builders) {
