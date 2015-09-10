@@ -51,6 +51,6 @@ public class GetTest {
         Tester tester = new Tester();
         tester.setId(100);
 //        tester.setName("tester");
-        webTemplate.perform(api(TestAPI.class).postTester(tester)).andDo(print());
+        webTemplate.perform(api(TestAPI.class).postTester(null, null)).andDo(print());
     }
 }

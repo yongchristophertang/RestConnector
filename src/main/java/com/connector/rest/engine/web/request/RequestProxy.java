@@ -21,8 +21,10 @@ import com.connector.rest.engine.web.http.HttpMethod;
 import com.connector.rest.engine.web.http.MultipartBodyFormBuilder;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import javaslang.Tuple2;
+import javaslang.control.Match;
+import javaslang.control.Try;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -92,47 +94,21 @@ public final class RequestProxy implements InvocationHandler {
         Map<String, String> pathParams = new HashMap<>();
         Multimap<String, String> fileParams = ArrayListMultimap.create();
         Map<String, String> headerParams = new HashMap<>();
-        String contentType;
-        String accept;
 
+        /* Handle the class level annotations: Host and Path */
+        // The url will be the URL path for the request
         String url = getHost(method.getDeclaringClass().getAnnotation(Host.class));
+
+        /* Handle the method level annotations: Path, HTTPMethod, Produce and Consume */
         url += getPath(method.getDeclaringClass().getAnnotation(Path.class)) +
                 getPath(method.getAnnotation(Path.class));
 
-        Lists.newArrayList(method.getDeclaringClass().getFields()).stream().filter(f -> {
-            try {
-                return f.get(null) != null;
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                return false;
-            }
-        }).forEach(f -> {
-            try {
-                if (f.isAnnotationPresent(PathParam.class)) {
-                    StringConverter converter = f.getAnnotation(PathParam.class).converter().newInstance();
-                    pathParams.put(f.getAnnotation(PathParam.class).value(), converter.convert(f.get(null)));
-                } else if (f.isAnnotationPresent(BodyParam.class)) {
-                    StringConverter converter = f.getAnnotation(BodyParam.class).converter().newInstance();
-                    bodyParams.put(f.getAnnotation(BodyParam.class).value(), converter.convert(f.get(null)));
-                } else if (f.isAnnotationPresent(QueryParam.class)) {
-                    StringConverter converter = f.getAnnotation(QueryParam.class).converter().newInstance();
-                    queryParams.put(f.getAnnotation(QueryParam.class).value(), converter.convert(f.get(null)));
-                } else if (f.isAnnotationPresent(HeaderParam.class)) {
-                    StringConverter converter = f.getAnnotation(HeaderParam.class).converter().newInstance();
-                    headerParams.put(f.getAnnotation(HeaderParam.class).value(), converter.convert(f.get(null)));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        // Handle Produce and Consume
+        String contentType = Optional.ofNullable(method.getAnnotation(Produce.class)).map(Produce::value).orElse(null);
+        String accept = Optional.ofNullable(method.getAnnotation(Consume.class)).map(Consume::value).orElse(null);
 
-        Produce produce = method.getAnnotation(Produce.class);
-        contentType = produce != null ? produce.value() : null;
-
-        Consume consume = method.getAnnotation(Consume.class);
-        accept = consume != null ? consume.value() : null;
-
-        List<HTTPMethod> httpMethods = Lists.newArrayList(method.getAnnotations()).stream()
+        // Handle HTTPMethod, only ONE HTTPMethod can be annotated with one method
+        List<HTTPMethod> httpMethods = Arrays.asList(method.getAnnotations()).stream()
                 .map(a -> a.annotationType().getAnnotation(HTTPMethod.class)).filter(m -> m != null).collect(
                         Collectors.toList());
         if (httpMethods.size() != 1) {
@@ -142,33 +118,41 @@ public final class RequestProxy implements InvocationHandler {
         notNull(httpMethods.get(0).value(), "Http Method is not defined");
         HttpMethod httpMethod = HttpMethod.valueOf(httpMethods.get(0).value());
 
-        // insert parameters into url
+        /*
+            Handle the field level annotations: PathParam, BodyParam, QueryParam and HeaderParam.
+            Noted that only the first annotation will be processed.
+         */
+        Arrays.asList(method.getDeclaringClass().getFields()).stream()
+                .filter(f -> Try.of(() -> Optional.of(f.get(null)).isPresent()).orElse(false)).forEach(f ->
+                Optional.ofNullable(f.getAnnotations()[0]).ifPresent(a -> Match
+                        .caze((PathParam anno) -> pathParams.put(anno.value(),
+                                Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
+                        .caze((BodyParam anno) -> bodyParams.put(anno.value(),
+                                Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
+                        .caze((QueryParam anno) -> queryParams.put(anno.value(),
+                                Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
+                        .caze((HeaderParam anno) -> headerParams.put(anno.value(),
+                                Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
+                        .apply(a)));
+
+        /*
+            Handle the method parameter level annotations: PathParam, BodyParam, QueryParam, HeaderParam and FileParam.
+            Noted that only the first annotation will be processed.
+        */
         Parameter[] parameters = method.getParameters();
-        IntStream.range(0, parameters.length).forEach(i -> {
-            Parameter p = parameters[i];
-            if (args[i] == null) {
-                return;
-            }
-            try {
-                if (p.isAnnotationPresent(PathParam.class)) {
-                    StringConverter converter = p.getAnnotation(PathParam.class).converter().newInstance();
-                    pathParams.put(p.getAnnotation(PathParam.class).value(), converter.convert(args[i]));
-                } else if (p.isAnnotationPresent(BodyParam.class)) {
-                    StringConverter converter = p.getAnnotation(BodyParam.class).converter().newInstance();
-                    bodyParams.put(p.getAnnotation(BodyParam.class).value(), converter.convert(args[i]));
-                } else if (p.isAnnotationPresent(FileParam.class)) {
-                    fileParams.put(p.getAnnotation(FileParam.class).value(), args[i].toString());
-                } else if (p.isAnnotationPresent(QueryParam.class)) {
-                    StringConverter converter = p.getAnnotation(QueryParam.class).converter().newInstance();
-                    queryParams.put(p.getAnnotation(QueryParam.class).value(), converter.convert(args[i]));
-                } else if (p.isAnnotationPresent(HeaderParam.class)) {
-                    StringConverter converter = p.getAnnotation(HeaderParam.class).converter().newInstance();
-                    headerParams.put(p.getAnnotation(HeaderParam.class).value(), converter.convert(args[i]));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        IntStream.range(0, parameters.length).filter(i -> args[i] != null).mapToObj(
+                i -> new Tuple2<>(parameters[i], args[i]))
+                .forEach(t -> Optional.ofNullable(t._1.getAnnotations()[0]).ifPresent(a -> Match
+                        .caze((PathParam anno) -> pathParams.put(anno.value(),
+                                Try.of(() -> anno.converter().newInstance().convert(t._2)).orElse(null)))
+                        .caze((BodyParam anno) -> bodyParams.put(anno.value(),
+                                Try.of(() -> anno.converter().newInstance().convert(t._2)).orElse(null)))
+                        .caze((QueryParam anno) -> queryParams.put(anno.value(),
+                                Try.of(() -> anno.converter().newInstance().convert(t._2)).orElse(null)))
+                        .caze((HeaderParam anno) -> headerParams.put(anno.value(),
+                                Try.of(() -> anno.converter().newInstance().convert(t._2)).orElse(null)))
+                        .caze((FileParam anno) -> String.valueOf(fileParams.put(anno.value(), t._2.toString())))
+                        .apply(a)));
 
         /**
          * Local inner class for creating a {@link HttpRequestBuilders} or {@link HttpMultipartRequestBuilders}.

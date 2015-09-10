@@ -49,7 +49,8 @@ public interface TestAPI {
 
     @POST
     @Path("/test")
-    RequestBuilder postTester(@BodyParam(value = "tester", converter = JsonStringConverter.class) Tester tester);
+    @GET
+    RequestBuilder postTester(@QueryParam("test") String test, @BodyParam(value = "tester", converter = JsonStringConverter.class) Tester tester);
 
     @Path("/areas")
     @GET
