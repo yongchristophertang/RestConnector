@@ -1,9 +1,9 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.connector.rest</groupId>
+    <groupId>com.github.yongchristophertang</groupId>
     <artifactId>rest-connector</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <name>RestConnector</name>
 
     <properties>
@@ -14,7 +14,6 @@
     </repositories>
 
     <distributionManagement>
-
     </distributionManagement>
 
     <dependencies>
@@ -154,12 +153,19 @@
             <version>3.3.2</version>
         </dependency>
 
+        <!-- FP Utils -->
+        <dependency>
+            <groupId>com.javaslang</groupId>
+            <artifactId>javaslang</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+
 
     </dependencies>
 
 
     <build>
-        <finalName>RestConnector</finalName>
+        <finalName>rest-connector</finalName>
         <defaultGoal>install</defaultGoal>
 
         <plugins>
@@ -197,6 +203,23 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.8.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
             </plugin>
         </plugins>
         <sourceDirectory>src/main/java</sourceDirectory>
