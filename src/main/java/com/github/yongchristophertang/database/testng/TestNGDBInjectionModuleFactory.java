@@ -28,7 +28,7 @@ import org.testng.ITestContext;
  *
  * Example is:
  * <pre>
- *     @Guice(moduleFactory = TestNGDBModuleFactory.class)
+ *     \\@Guice(moduleFactory = TestNGDBModuleFactory.class)
  * </pre>
  *
  * @author Yong Tang

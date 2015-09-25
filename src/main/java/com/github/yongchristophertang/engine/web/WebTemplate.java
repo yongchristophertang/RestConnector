@@ -31,9 +31,9 @@ import java.util.List;
 
 /**
  * <strong>Main entry point for Http engine support.</strong>
- * <p/>
- * <p>Below is an example:
- * <p/>
+ *
+ * Below is an example:
+ *
  * <pre>
  *
  * WebTemplate webTemplate = WebTemplateBuilder.defaultConfig().build();

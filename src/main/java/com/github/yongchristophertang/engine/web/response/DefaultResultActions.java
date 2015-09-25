@@ -50,7 +50,7 @@ public class DefaultResultActions implements ResultActions {
      *   .andExpect(flash().attribute("message", "success!"));
      * </pre>
      *
-     * @param matcher
+     * @param matcher matcher for assertion
      */
     @Override
     public ResultActions andExpect(ResultMatcher matcher) throws Exception {
@@ -66,7 +66,7 @@ public class DefaultResultActions implements ResultActions {
      * mockMvc.perform(get("/form")).andDo(print());
      * </pre>
      *
-     * @param handler
+     * @param handler handler for processing response data
      */
     @Override
     public ResultActions andDo(ResultHandler handler) throws Exception {

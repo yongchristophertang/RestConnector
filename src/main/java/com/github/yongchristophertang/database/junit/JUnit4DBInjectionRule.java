@@ -37,7 +37,7 @@ import java.util.Map;
  * <p/>
  * Example:
  * <pre>
- *     @Rule
+ *     \@Rule
  *     public JUnit4DBInjectionRule rule = new JUnit4DBInjectionRule();
  * </pre>
  *

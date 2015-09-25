@@ -40,8 +40,8 @@ import static com.github.yongchristophertang.engine.AssertUtils.stringNotBlank;
 /**
  * Default builder for {@link HttpRequestBase} required as input to
  * perform request in {@link WebTemplate}.
- * <p/>
- * <p>Application tests will typically access this builder through the static
+ *
+ * Application tests will typically access this builder through the static
  * factory methods in {@link TestRequestBuilders}.
  *
  * @author Yong Tang

@@ -40,7 +40,7 @@ public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
      * the {@code MockHttpServletRequest} can be plugged in via
      * {@link #with(RequestPostProcessor)}.
      *
-     * @param httpRequest
+     * @param httpRequest an HttpRequest object
      * @param urlTemplate  a URL template; the resulting URL will be encoded
      * @param urlVariables zero or more URL variables
      */

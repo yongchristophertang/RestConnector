@@ -53,7 +53,7 @@ public class LoggerProxyFactory<T> implements ProxyFactory<T>, InvocationHandler
     }
 
     /**
-     * @{@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
     @SuppressWarnings("unchecked")

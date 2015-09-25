@@ -30,7 +30,7 @@ import org.testng.TestListenerAdapter;
  * <p/>
  * Example is:
  * <pre>
- *     @Listeners(TestNGDBInjectionListener.class)
+ *     \\@Listeners(TestNGDBInjectionListener.class)
  * </pre>
  *
  * @author Yong Tang

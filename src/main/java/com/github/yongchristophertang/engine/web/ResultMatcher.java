@@ -18,12 +18,12 @@ package com.github.yongchristophertang.engine.web;
 
 /**
  * Matches the result of an executed request against some expectation.
- * <p/>
+ *
  * <p>See static factory methods in
  * {@code org.springframework.engine.web.server.result.MockMvcResultMatchers}.
- * <p/>
+ *
  * <p>Example:
- * <p/>
+ *
  * <pre>
  * static imports: MockMvcRequestBuilders.*, MockMvcResultMatchers.*
  *

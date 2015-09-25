@@ -22,8 +22,8 @@ import org.apache.http.HttpRequest;
  * Extension point for applications or 3rd party libraries that wish to further
  * initialize a {@link org.apache.http.client.methods.HttpRequestBase} instance after it has been built
  * by {@link HttpRequestBuilders} or its subclass {@link HttpMultipartRequestBuilders}.
- * <p/>
- * <p>Implementations of this interface can be provided to
+ *
+ * Implementations of this interface can be provided to
  * {@link HttpRequestBuilders#with(RequestPostProcessor)} at the time
  * when a request is about to be performed.
  *
