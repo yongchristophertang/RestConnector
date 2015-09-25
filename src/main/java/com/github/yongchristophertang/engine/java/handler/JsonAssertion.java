@@ -41,52 +41,58 @@ public class JsonAssertion {
      * Evaluate the JSONPath and assert the value of the content found with the
      * given Hamcrest {@code Matcher}.
      */
-    public <T> void pathMatch(String expression, final Matcher<T> matcher) {
+    public <T> JsonAssertion pathMatch(String expression, final Matcher<T> matcher) {
         MatcherAssert.assertThat("Json value for " + expression, JsonPath.compile(expression).read(context), matcher);
+        return this;
     }
 
     /**
      * Evaluate the JSONPath and assert the value of the content found.
      */
-    public <T> void pathMatch(String expression, T matcher) {
+    public <T> JsonAssertion pathMatch(String expression, T matcher) {
         pathMatch(expression, equalTo(matcher));
+        return this;
     }
 
     /**
      * Evaluate the JSONPath and assert that content exists.
      */
-    public void pathExist(String expression) {
+    public JsonAssertion pathExist(String expression) {
         Object value = JsonPath.compile(expression).read(context);
         MatcherAssert.assertThat("Jason Path Exists:", value, notNullValue());
         if (value instanceof List) {
             MatcherAssert.assertThat("Jason Path Collection Exists:", ((List<?>) value).isEmpty(), is(false));
         }
+        return this;
     }
 
     /**
      * Evaluate the JSON path and assert no content was found.
      */
-    public void pathNotExist(String expression) {
+    public JsonAssertion pathNotExist(String expression) {
         Object value = JsonPath.compile(expression).read(context);
         MatcherAssert.assertThat("Jason Path Exists:", value, nullValue());
         if (value instanceof List) {
             MatcherAssert.assertThat("Jason Path Collection Exists:", ((List<?>) value).isEmpty(), is(true));
         }
+        return this;
     }
 
     /**
      * Evaluate the JSON path and assert the content found is an array.
      */
-    public void isArray(String expression) {
+    public JsonAssertion isArray(String expression) {
         pathMatch(expression, instanceOf(List.class));
+        return this;
     }
 
     /**
      * Evaluate the JSON path and assert the array found has the expected size.
      */
-    public void arraySize(String expression, int size) {
+    public JsonAssertion arraySize(String expression, int size) {
         pathMatch(expression, instanceOf(List.class));
         MatcherAssert.assertThat("Json Path List Size:",
                 ((List<?>) JsonPath.compile(expression).read(context)).size(), is(size));
+        return this;
     }
 }
