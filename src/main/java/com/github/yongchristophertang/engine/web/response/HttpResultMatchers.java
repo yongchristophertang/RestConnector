@@ -19,6 +19,8 @@ package com.github.yongchristophertang.engine.web.response;
 import com.github.yongchristophertang.engine.web.ResultMatcher;
 import org.hamcrest.Matcher;
 
+import static org.hamcrest.CoreMatchers.is;
+
 /**
  * Static, factory methods for {@link ResultMatcher}-based result actions.
  *
@@ -44,6 +46,16 @@ public abstract class HttpResultMatchers {
      */
     public static <T> ResultMatcher jsonPath(String expression, Matcher<T> matcher) {
         return new JsonPathResultMatchers(expression).value(matcher);
+    }
+
+    /**
+     * Inspect a specific subset of the body and compare it with the expected value {@code expected}.
+     *
+     * @param expression the JSON path expression
+     * @param expected expcted value
+     */
+    public static <T> ResultMatcher jsonPath(String expression, T expected) {
+        return jsonPath(expression, is(expected));
     }
 
     /**

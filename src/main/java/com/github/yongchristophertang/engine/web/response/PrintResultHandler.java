@@ -16,9 +16,9 @@
 
 package com.github.yongchristophertang.engine.web.response;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.yongchristophertang.engine.web.HttpResult;
 import com.github.yongchristophertang.engine.web.ResultHandler;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.RequestLine;
@@ -52,24 +52,27 @@ public class PrintResultHandler implements ResultHandler {
     @Override
     public void handle(HttpResult result) throws Exception {
         RequestLine rl = result.getHttpRequest().getRequestLine();
-        logger.info("Request URI: " + rl);
+        String body = URLDecoder
+            .decode(EntityUtils.toString(((HttpEntityEnclosingRequest) result.getHttpRequest()).getEntity()), "UTF-8");
+        String formatter = "HTTP Request&Response Log: \n\n \t Request URL: {} \n\n \t ";
         if (rl.getMethod().equals("POST") || rl.getMethod().equals("PUT") || rl.getMethod().equals("PATCH")) {
             try {
-                logger.info("Request Body (URL Decoded): " +
-                        URLDecoder.decode(EntityUtils
-                                .toString(((HttpEntityEnclosingRequest) result.getHttpRequest()).getEntity()),
-                                "UTF-8"));
+                formatter += "Request Body (URL Decoded): {} \n\n \t ";
             } catch (UnsupportedOperationException e) {
-                logger.info("Request Body: " + "Multipart Body Cannot Be Displayed.");
+                formatter += "Multipart Body Cannot Be Displayed which is {}. \n\n \t ";
             } catch (IllegalArgumentException e) {
-                logger.info("Request Body: None");
+                formatter += "Request Body: {} \n\n \t";
             }
         }
-        logger.info("Request Headers: " + Lists.newArrayList(result.getHttpRequest().getAllHeaders()));
-        logger.info("Cost Time(ms): " + result.getCostTime());
-        logger.info("Response Status: " + result.getHttpResponse().getStatusLine());
-        logger.info("Response Headers: " + Lists.newArrayList(result.getHttpResponse().getAllHeaders()));
-        logger.info("Response Content: \n" + getPrettyJsonPrint(result.getResponseStringContent()) + "\n");
+        formatter +=
+            "Request Headers: {} \n\n \t Cost Time(ms): {} \n\n \t Response Status: {} \n\n \t Response Headers: {} " +
+                "\n\n \t " +
+                "Response Content: \n {} \n========================================================================\n";
+
+        logger.info(formatter, rl, body, Lists.newArrayList(result.getHttpRequest().getAllHeaders()),
+            result.getCostTime(), result.getHttpResponse().getStatusLine(),
+            Lists.newArrayList(result.getHttpResponse().getAllHeaders()),
+            getPrettyJsonPrint(result.getResponseStringContent()));
     }
 
     /**
@@ -82,9 +85,9 @@ public class PrintResultHandler implements ResultHandler {
         ObjectMapper mapper = new ObjectMapper();
         try {
             Object json = mapper.readValue(rawJson,
-                    Object.class);
+                Object.class);
             return mapper.writerWithDefaultPrettyPrinter()
-                    .writeValueAsString(json);
+                .writeValueAsString(json);
         } catch (Exception e) {
             return rawJson;
         }

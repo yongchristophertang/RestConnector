@@ -23,15 +23,19 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import javaslang.Tuple2;
+import javaslang.collection.Stream;
 import javaslang.control.Match;
+import javaslang.control.Option;
 import javaslang.control.Try;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -122,37 +126,36 @@ public final class RequestProxy implements InvocationHandler {
             Handle the field level annotations: PathParam, BodyParam, QueryParam and HeaderParam.
             Noted that only the first annotation will be processed.
          */
-        Arrays.asList(method.getDeclaringClass().getFields()).stream()
-                .filter(f -> Try.of(() -> Optional.of(f.get(null)).isPresent()).orElse(false)).forEach(f ->
-                Optional.ofNullable(f.getAnnotations()[0]).ifPresent(a -> Match
-                        .caze((PathParam anno) -> pathParams.put(anno.value(),
-                                Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
-                        .caze((BodyParam anno) -> bodyParams.put(anno.value(),
-                                Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
-                        .caze((QueryParam anno) -> queryParams.put(anno.value(),
-                                Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
-                        .caze((HeaderParam anno) -> headerParams.put(anno.value(),
-                                Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
-                        .apply(a)));
+        Stream.ofAll(method.getDeclaringClass().getFields()).filter(f -> Try.of(() -> Optional.of(f.get(null)).isPresent()).orElse(false)).forEach(f ->
+                Optional.ofNullable(f.getAnnotations()[0]).map(Match.as(String.class)
+                        .whenType(PathParam.class).then(anno -> pathParams.put(anno.value(),
+                            Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
+                        .whenType(BodyParam.class).then(anno -> bodyParams.put(anno.value(),
+                            Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
+                        .whenType(QueryParam.class).then(anno -> queryParams.put(anno.value(),
+                            Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
+                        .whenType(HeaderParam.class).then(anno -> headerParams.put(anno.value(),
+                            Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))));
 
         /*
             Handle the method parameter level annotations: PathParam, BodyParam, QueryParam, HeaderParam and FileParam.
             Noted that only the first annotation will be processed.
         */
         Parameter[] parameters = method.getParameters();
-        IntStream.range(0, parameters.length).filter(i -> args[i] != null).mapToObj(
-                i -> new Tuple2<>(parameters[i], args[i]))
-                .forEach(t -> Optional.ofNullable(t._1.getAnnotations()[0]).ifPresent(a -> Match
-                        .caze((PathParam anno) -> pathParams.put(anno.value(),
-                                Try.of(() -> anno.converter().newInstance().convert(t._2)).orElse(null)))
-                        .caze((BodyParam anno) -> bodyParams.put(anno.value(),
-                                Try.of(() -> anno.converter().newInstance().convert(t._2)).orElse(null)))
-                        .caze((QueryParam anno) -> queryParams.put(anno.value(),
-                                Try.of(() -> anno.converter().newInstance().convert(t._2)).orElse(null)))
-                        .caze((HeaderParam anno) -> headerParams.put(anno.value(),
-                                Try.of(() -> anno.converter().newInstance().convert(t._2)).orElse(null)))
-                        .caze((FileParam anno) -> String.valueOf(fileParams.put(anno.value(), t._2.toString())))
-                        .apply(a)));
+        Stream.range(0, parameters.length).dropWhile(
+            i -> args[i] == null || parameters[i].getAnnotations() == null).map(
+            i -> new Tuple2<>(parameters[i].getAnnotations()[0], args[i])).forEach(t -> Option.of(t._1)
+            .map(Match.as(String.class)
+                .whenType(PathParam.class).then(p -> pathParams
+                        .put(p.value(), Try.of(() -> p.converter().newInstance().convert(t._2)).orElse(null)))
+                .whenType(BodyParam.class).then(p -> bodyParams
+                    .put(p.value(), Try.of(() -> p.converter().newInstance().convert(t._2)).orElse(null)))
+                    .whenType(QueryParam.class).then(p -> queryParams
+                        .put(p.value(), Try.of(() -> p.converter().newInstance().convert(t._2)).orElse(null)))
+                    .whenType(HeaderParam.class).then(p -> headerParams
+                        .put(p.value(), Try.of(() -> p.converter().newInstance().convert(t._2)).orElse(null)))
+                .whenType(FileParam.class).then(p-> String.valueOf(fileParams.put(p.value(), t._2.toString()))
+            )));
 
         /**
          * Local inner class for creating a {@link HttpRequestBuilders} or {@link HttpMultipartRequestBuilders}.
