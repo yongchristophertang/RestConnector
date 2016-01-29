@@ -16,7 +16,6 @@
 
 package com.github.yongchristophertang.database.testng;
 
-import com.github.yongchristophertang.config.Property;
 import com.github.yongchristophertang.database.annotations.SqlDB;
 import com.google.inject.Inject;
 import org.testng.annotations.BeforeClass;
@@ -32,19 +31,22 @@ import java.sql.SQLException;
  * @since 0.4
  */
 @Test
-@SqlDB(url = "111", userName = "222", password = "333")
-@SqlDB(url = "333", userName = "222", password = "333")
+//@SqlDB(url = "111", userName = "222", password = "333")
+//@SqlDB(url = "333", userName = "222", password = "333")
+@SqlDB(url = "jdbc:sqlserver://172.16.79.25:1433;databaseName=usp_center_iflybook_test", userName = "sa", password = "Iflysql@server123")
 public class GuiceTest extends AbstractGuiceTest {
 //    @Inject
 //    private Provider<JdbcTemplate> jdbcTemplateProvider;
 
 
-    @Property("http.port")
-    public String httpPort;
+//    @Property("http.port")
+//    public String httpPort;
     @Inject
     private DataSource dataSource;
-    @Inject
-    private DataSource dataSource2;
+//    @Inject
+//    private DataSource dataSource2;
+//    @Inject
+//    private DataSource dataSource3;
 
     @BeforeClass
     private void setUp() {
@@ -53,17 +55,19 @@ public class GuiceTest extends AbstractGuiceTest {
     }
 @Test
     private void testDemo() throws SQLException {
-        System.out.println(dataSource);
-        System.out.println(dataSource2);
-        dataSource.getConnection();
-        System.out.println(httpPort);
+    System.out.println(dataSource0.getConnection().getMetaData());
+    System.out.println(dataSource0.getConnection().isValid(100));
+    System.out.println(dataSource);
+//        System.out.println(dataSource2);
+//        dataSource.getConnection();
+//        System.out.println(httpPort);
 //        System.out.println(httpHost);
     }
 
     @Test
     private void testDemo2() {
         System.out.println(dataSource);
-        System.out.println(dataSource2);
+//        System.out.println(dataSource2);
     }
 
 }

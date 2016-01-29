@@ -16,28 +16,21 @@
 
 package com.github.yongchristophertang.engine.web.request;
 
+import com.github.yongchristophertang.engine.web.annotations.*;
 import com.github.yongchristophertang.engine.web.http.HttpMethod;
 import com.github.yongchristophertang.engine.web.http.MultipartBodyFormBuilder;
-import com.github.yongchristophertang.engine.web.annotations.*;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import javaslang.Tuple2;
-import javaslang.collection.Stream;
-import javaslang.control.Match;
-import javaslang.control.Option;
 import javaslang.control.Try;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.github.yongchristophertang.engine.AssertUtils.notNull;
 
@@ -52,6 +45,7 @@ import static com.github.yongchristophertang.engine.AssertUtils.notNull;
  */
 public final class RequestProxy implements InvocationHandler {
     private static final RequestProxy INSTANCE = new RequestProxy();
+    private static final Logger LOGGER = LogManager.getLogger();
     /**
      * Use the reflected constructor to initialize a {@link java.lang.invoke.MethodHandles.Lookup} in order to
      * disable the access check with method {@link java.lang.invoke.MethodHandles.Lookup#in} which prevents access to
@@ -86,6 +80,7 @@ public final class RequestProxy implements InvocationHandler {
 
     // TODO: too messy, need to refactor data collection part
     @Override
+    @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // if the method is a default method, process with the default implementation
         if (method.isDefault()) {
@@ -93,8 +88,8 @@ public final class RequestProxy implements InvocationHandler {
                     .unreflectSpecial(method, method.getDeclaringClass()).bindTo(proxy).invokeWithArguments(args);
         }
 
-        Map<String, String> queryParams = new HashMap<>();
-        Map<String, String> bodyParams = new HashMap<>();
+        Multimap<String, String> queryParams = ArrayListMultimap.create();
+        Multimap<String, String> bodyParams = ArrayListMultimap.create();
         Map<String, String> pathParams = new HashMap<>();
         Multimap<String, String> fileParams = ArrayListMultimap.create();
         Map<String, String> headerParams = new HashMap<>();
@@ -126,36 +121,126 @@ public final class RequestProxy implements InvocationHandler {
             Handle the field level annotations: PathParam, BodyParam, QueryParam and HeaderParam.
             Noted that only the first annotation will be processed.
          */
-        Stream.ofAll(method.getDeclaringClass().getFields()).filter(f -> Try.of(() -> Optional.of(f.get(null)).isPresent()).orElse(false)).forEach(f ->
-                Optional.ofNullable(f.getAnnotations()[0]).map(Match.as(String.class)
-                        .whenType(PathParam.class).then(anno -> pathParams.put(anno.value(),
-                            Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
-                        .whenType(BodyParam.class).then(anno -> bodyParams.put(anno.value(),
-                            Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
-                        .whenType(QueryParam.class).then(anno -> queryParams.put(anno.value(),
-                            Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))
-                        .whenType(HeaderParam.class).then(anno -> headerParams.put(anno.value(),
-                            Try.of(() -> anno.converter().newInstance().convert(f.get(null))).orElse(null)))));
+        Field[] fields = method.getDeclaringClass().getFields();
+        try {
+            for (Field f : fields) {
+                Object value = f.get(null);
+                if (value != null) {
+                    Class<? extends Annotation> annotationType = f.getAnnotations()[0].annotationType();
+                    if (annotationType == PathParam.class) {
+                        PathParam a = f.getAnnotation(PathParam.class);
+                        pathParams.put(a.value(), a.converter().newInstance().convert(value));
+                    } else if (annotationType == BodyParam.class) {
+                        BodyParam a = f.getAnnotation(BodyParam.class);
+                        if (value instanceof Collection) {
+                            bodyParams.putAll(a.value(), (Iterable<? extends String>)
+                                ((Collection) value).stream()
+                                    .map(v -> Try.of(() -> a.converter().newInstance().convert(v)).orElse(""))
+                                    .collect(Collectors.toList()));
+                        } else if (value instanceof Map) {
+                            ((Map<String, Object>) value).entrySet().parallelStream().forEach(e -> bodyParams.put(e.getKey(), e.getValue().toString()));
+                        } else {
+                            bodyParams.put(a.value(), a.converter().newInstance().convert(value));
+                        }
+                    } else if (annotationType == QueryParam.class) {
+                        QueryParam a = f.getAnnotation(QueryParam.class);
+                        if (value instanceof Collection) {
+                            queryParams.putAll(a.value(), (Iterable<? extends String>)
+                                ((Collection) value).stream().map(v -> Try.of(() -> a.converter().newInstance().convert(v)).orElse(""))
+                                    .collect(Collectors.toList()));
+                        } else {
+                            queryParams.put(a.value(), a.converter().newInstance().convert(value));
+                        }
+                    } else if (annotationType == HeaderParam.class) {
+                        HeaderParam a = f.getAnnotation(HeaderParam.class);
+                        headerParams.put(a.value(), a.converter().newInstance().convert(value));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Cannot process filed level annotations");
+        }
+//        Stream.of(method.getDeclaringClass().getFields()).filter(f -> Try.of(() -> Optional.of(f.get(null)).isPresent()).orElse(false)).forEach(f ->
+//                Optional.ofNullable(f.getAnnotations()[0]).map(Match.as(String.class)
+//                        .whenType(PathParam.class).then(anno -> Try.of(() -> anno.converter().newInstance().convert(f.get(null)))
+//                            .onSuccess(p -> pathParams.put(anno.value(), p)).orElse(""))
+//                        .whenType(BodyParam.class).then(anno -> Try.of(() -> {
+//                                Object object = f.get(null);
+//                                if (object instanceof Collection) {
+//                                    return ((Collection) object).stream().map(e -> Try.of(() -> anno.converter().newInstance().convert(e)).orElse("")).collect(Collectors.toList());
+//                                } else {
+//                                    return anno.converter().newInstance().convert(object);
+//                                }
+//                            }).onSuccess(p -> {
+//                                if (p instanceof Collection) {
+//                                    bodyParams.putAll(anno.value(), (Iterable<String>) p);
+//                                } else {
+//                                    bodyParams.put(anno.value(), String.valueOf(p));
+//                                }
+//                            }).orElse(""))
+//                        .whenType(QueryParam.class).then(anno -> Try.of(() -> anno.converter().newInstance().convert(f.get(null)))
+//                            .onSuccess(p -> queryParams.put(anno.value(), p)).orElse(""))
+//                        .whenType(HeaderParam.class).then(anno -> Try.of(() -> anno.converter().newInstance().convert(f.get(null)))
+//                            .onSuccess(p -> headerParams.put(anno.value(), p)).orElse(""))));
 
         /*
             Handle the method parameter level annotations: PathParam, BodyParam, QueryParam, HeaderParam and FileParam.
             Noted that only the first annotation will be processed.
         */
         Parameter[] parameters = method.getParameters();
-        Stream.range(0, parameters.length).dropWhile(
-            i -> args[i] == null || parameters[i].getAnnotations() == null).map(
-            i -> new Tuple2<>(parameters[i].getAnnotations()[0], args[i])).forEach(t -> Option.of(t._1)
-            .map(Match.as(String.class)
-                .whenType(PathParam.class).then(p -> pathParams
-                        .put(p.value(), Try.of(() -> p.converter().newInstance().convert(t._2)).orElse(null)))
-                .whenType(BodyParam.class).then(p -> bodyParams
-                    .put(p.value(), Try.of(() -> p.converter().newInstance().convert(t._2)).orElse(null)))
-                    .whenType(QueryParam.class).then(p -> queryParams
-                        .put(p.value(), Try.of(() -> p.converter().newInstance().convert(t._2)).orElse(null)))
-                    .whenType(HeaderParam.class).then(p -> headerParams
-                        .put(p.value(), Try.of(() -> p.converter().newInstance().convert(t._2)).orElse(null)))
-                .whenType(FileParam.class).then(p-> String.valueOf(fileParams.put(p.value(), t._2.toString()))
-            )));
+        try {
+           for (int i = 0; i < args.length; i++) {
+               if (args[i] != null && parameters[i].getAnnotations() != null) {
+                   Class<? extends Annotation> annotationType = parameters[i].getAnnotations()[0].annotationType();
+                   if (annotationType == PathParam.class) {
+                       PathParam a = parameters[i].getAnnotation(PathParam.class);
+                       pathParams.put(a.value(), a.converter().newInstance().convert(args[i]));
+                   } else if (annotationType == BodyParam.class) {
+                       BodyParam a = parameters[i].getAnnotation(BodyParam.class);
+                       if (args[i] instanceof Collection) {
+                           bodyParams.putAll(a.value(),
+                               (Iterable<? extends String>) ((Collection) args[i]).stream()
+                                   .map(v -> Try.of(() -> a.converter().newInstance().convert(v)).orElse("")).collect(Collectors.toList()));
+                       } else if (args[i] instanceof Map) {
+                           ((Map<String, Object>) args[i]).entrySet().parallelStream().forEach(e -> bodyParams.put(e.getKey(), e.getValue().toString()));
+                       } else {
+                           bodyParams.put(a.value(), a.converter().newInstance().convert(args[i]));
+                       }
+                   } else if (annotationType == QueryParam.class) {
+                       QueryParam a = parameters[i].getAnnotation(QueryParam.class);
+                       if (args[i] instanceof Collection) {
+                           queryParams.putAll(a.value(),
+                               (Iterable<? extends String>) ((Collection) args[i]).stream()
+                                   .map(v -> Try.of(() -> a.converter().newInstance().convert(v)).orElse("")).collect(Collectors.toList()));
+                       } else if (args[i] instanceof Map) {
+                           ((Map<String, Object>) args[i]).entrySet().parallelStream().forEach(e -> queryParams.put(e.getKey(), e.getValue().toString()));
+                       } else {
+                           queryParams.put(a.value(), a.converter().newInstance().convert(args[i]));
+                       }
+                   } else if (annotationType == HeaderParam.class) {
+                       HeaderParam a = parameters[i].getAnnotation(HeaderParam.class);
+                       headerParams.put(a.value(), a.converter().newInstance().convert(args[i]));
+                   }
+               }
+           }
+        } catch (Exception e) {
+            LOGGER.error("Cannot process parameter level annotations");
+        }
+
+
+//        Stream.range(0, parameters.length).filter(
+//            i -> args[i] != null & parameters[i].getAnnotations() != null).map(
+//            i -> new Tuple2<>(parameters[i].getAnnotations()[0], args[i])).forEach(t -> Option.of(t._1).map(Match.as(String.class)
+//                .whenType(PathParam.class).then(p -> Try.of(() -> p.converter().newInstance().convert(t._2))
+//                    .onSuccess(v -> pathParams.put(p.value(), v)).orElse(""))
+//                .whenType(BodyParam.class).then(p -> Try.of(() -> p.converter().newInstance().convert(t._2))
+//                    .onSuccess(v -> bodyParams.put(p.value(), v)).orElse(""))
+//                .whenType(QueryParam.class).then(p -> Try.of(() -> p.converter().newInstance().convert(t._2))
+//                    .onSuccess(v -> queryParams.put(p.value(), v)).orElse(""))
+//                .whenType(HeaderParam.class).then(p -> Try.of(() -> p.converter().newInstance().convert(t._2))
+//                    .onSuccess(v -> headerParams.put(p.value(), v)).orElse(""))
+//                .whenType(FileParam.class).then(p -> String.valueOf(fileParams.put(p.value(), t._2.toString()))
+//            )));
 
         /**
          * Local inner class for creating a {@link HttpRequestBuilders} or {@link HttpMultipartRequestBuilders}.
@@ -289,7 +374,8 @@ public final class RequestProxy implements InvocationHandler {
             void bodyBuild() {
                 bodyParams.keySet().stream().forEach(key -> {
                     if (key.equals("")) {
-                        builders.body(bodyParams.get(key));
+                        // if use a raw string to set up body, then we only add the first value, igonor the further
+                        builders.body(bodyParams.get(key).iterator().next());
                     } else {
                         builders.body(key, bodyParams.get(key));
                     }

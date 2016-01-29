@@ -52,22 +52,25 @@ public class PrintResultHandler implements ResultHandler {
     @Override
     public void handle(HttpResult result) throws Exception {
         RequestLine rl = result.getHttpRequest().getRequestLine();
-        String body = URLDecoder
-            .decode(EntityUtils.toString(((HttpEntityEnclosingRequest) result.getHttpRequest()).getEntity()), "UTF-8");
+        String body = null;
         String formatter = "HTTP Request&Response Log: \n\n \t Request URL: {} \n\n \t ";
         if (rl.getMethod().equals("POST") || rl.getMethod().equals("PUT") || rl.getMethod().equals("PATCH")) {
             try {
+                body = URLDecoder
+                    .decode(EntityUtils.toString(((HttpEntityEnclosingRequest) result.getHttpRequest()).getEntity()), "UTF-8");
                 formatter += "Request Body (URL Decoded): {} \n\n \t ";
             } catch (UnsupportedOperationException e) {
                 formatter += "Multipart Body Cannot Be Displayed which is {}. \n\n \t ";
             } catch (IllegalArgumentException e) {
-                formatter += "Request Body: {} \n\n \t";
+                formatter += "Request Body: {} \n\n \t ";
             }
+        } else {
+            formatter += "Request Body Not Applicable: {}\n\n \t ";
         }
         formatter +=
             "Request Headers: {} \n\n \t Cost Time(ms): {} \n\n \t Response Status: {} \n\n \t Response Headers: {} " +
                 "\n\n \t " +
-                "Response Content: \n {} \n========================================================================\n";
+                "Response Content: \n {} \n=======================================================================\n";
 
         logger.info(formatter, rl, body, Lists.newArrayList(result.getHttpRequest().getAllHeaders()),
             result.getCostTime(), result.getHttpResponse().getStatusLine(),

@@ -35,7 +35,7 @@ public @interface QueryParam {
     /**
      * Query parameter name
      */
-    String value();
+    String value() default "";
 
     /**
      * Converter for transferring query paramter object into query string.

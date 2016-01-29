@@ -32,10 +32,9 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.github.yongchristophertang.engine.AssertUtils.arrayNotEmpty;
-import static com.github.yongchristophertang.engine.AssertUtils.notNull;
-import static com.github.yongchristophertang.engine.AssertUtils.stringNotBlank;
+import static com.github.yongchristophertang.engine.AssertUtils.*;
 
 /**
  * Default builder for {@link HttpRequestBase} required as input to
@@ -116,6 +115,18 @@ public class HttpRequestBuilders implements RequestBuilder {
     public HttpRequestBuilders param(String name, String value) {
         Objects.requireNonNull(name, "parameter name must not be null");
         Optional.ofNullable(value).ifPresent(v -> parameters.add(new BasicNameValuePair(name, v)));
+        return this;
+    }
+
+    /**
+     * Add a multi value request parameter to {@link HttpRequestBuilders}.
+     *
+     * @param name the parameter name
+     * @param values multi values of the parameter
+     */
+    public HttpRequestBuilders param(String name, Collection<String> values) {
+        Objects.requireNonNull(name, "parameter name must not be null");
+        parameters.addAll(values.stream().map(v -> new BasicNameValuePair(name, v)).collect(Collectors.toList()));
         return this;
     }
 
@@ -207,6 +218,13 @@ public class HttpRequestBuilders implements RequestBuilder {
         stringNotBlank(value, "Value must not be blank");
 
         bodyParameters.add(new BasicNameValuePair(param, value));
+        return this;
+    }
+
+    public HttpRequestBuilders body(String param, Collection<String> values) {
+        notNull(param, "Parameter must not be null");
+
+        bodyParameters.addAll(values.stream().map(v -> new BasicNameValuePair(param, v)).collect(Collectors.toList()));
         return this;
     }
 

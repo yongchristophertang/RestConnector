@@ -20,6 +20,10 @@ import com.github.yongchristophertang.engine.web.request.TestRequestBuilders;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.github.yongchristophertang.engine.web.response.HttpResultHandlers.print;
 
 /**
@@ -51,6 +55,9 @@ public class GetTest {
         Tester tester = new Tester();
         tester.setId(100);
 //        tester.setName("tester");
-        webTemplate.perform(TestRequestBuilders.api(TestAPI.class).postTester(null, null)).andDo(print());
+        Map<String, String> queries = new HashMap<>();
+        queries.put("add1", "value1");
+        queries.put("add2", "value2");
+        webTemplate.perform(TestRequestBuilders.api(TestAPI.class).postTester("", Arrays.asList("1", "2", "3"), null, queries)).andDo(print());
     }
 }

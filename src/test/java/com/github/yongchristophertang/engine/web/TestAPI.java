@@ -20,6 +20,9 @@ import com.github.yongchristophertang.engine.web.annotations.*;
 import com.github.yongchristophertang.engine.web.request.JsonStringConverter;
 import com.github.yongchristophertang.engine.web.request.RequestBuilder;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by YongTang on 2015/3/17.
  *
@@ -47,10 +50,10 @@ public interface TestAPI {
     @Consume("application/json")
     RequestBuilder postGrade(@BodyParam String id);
 
-    @POST
     @Path("/test")
-    @GET
-    RequestBuilder postTester(@QueryParam("test") String test, @BodyParam(value = "tester", converter = JsonStringConverter.class) Tester tester);
+    @POST
+    RequestBuilder postTester(@QueryParam("test") String test, @QueryParam("test_list")
+        List<String> list, @BodyParam(value = "tester", converter = JsonStringConverter.class) Tester tester, @QueryParam Map<String, String> map);
 
     @Path("/areas")
     @GET

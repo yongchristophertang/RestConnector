@@ -23,6 +23,7 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -52,6 +53,12 @@ public class MultipartBodyFormBuilder implements FormBuilder {
     public MultipartBodyFormBuilder param(String name, String value) {
         AssertUtils.notNull(name, "Parameter name must not be null.");
         Optional.ofNullable(value).ifPresent(v -> builder.addTextBody(name, v, ContentType.TEXT_PLAIN));
+        return this;
+    }
+
+    public MultipartBodyFormBuilder param(String name, Collection<String> values) {
+        AssertUtils.notNull(name, "Parameter name must not be null.");
+        values.stream().forEach(v -> builder.addTextBody(name, v, ContentType.TEXT_PLAIN));
         return this;
     }
 

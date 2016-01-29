@@ -55,7 +55,6 @@ public class TestNGDBInjectionListener extends TestListenerAdapter {
         Lists.newArrayList(testInstances).forEach(injector::injectMembers);
         injector.injectMembers(this);
 
-        context.addGuiceModule(Module.class, module);
         context.addInjector(Lists.newArrayList(module), injector);
     }
 }
