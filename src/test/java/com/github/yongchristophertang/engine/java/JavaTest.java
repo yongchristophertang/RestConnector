@@ -31,4 +31,10 @@ public class JavaTest {
         DemoInterface di = ProxyFactories.createLoggerProxy(new DemoClient());
         di.test();
     }
+
+    @Test
+    public void testDemo2() {
+        TestClassClient proxy = ProxyFactories.createClassLoggerProxy(new TestClassClient("oops,"));
+        proxy.testAPI("cool");
+    }
 }

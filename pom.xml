@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.yongchristophertang</groupId>
     <artifactId>rest-connector</artifactId>
-    <version>0.5.7</version>
+    <version>0.5.9</version>
     <name>RestConnector</name>
     <description>A test client framework for RESTful HTTP and Java APIs</description>
     <url>https://github.com/yongchristophertang/RestConnector</url>
@@ -46,6 +46,7 @@
         <javaslang.version>2.0.0-RC2</javaslang.version>
         <commons.lang3.version>3.3.2</commons.lang3.version>
         <hikari.version>2.4.2</hikari.version>
+        <cglib.version>2.2.2</cglib.version>
     </properties>
 
     <distributionManagement>
@@ -187,6 +188,12 @@
             <version>${javaslang.version}</version>
         </dependency>
 
+        <!-- cglib -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
+        </dependency>
 
     </dependencies>
 

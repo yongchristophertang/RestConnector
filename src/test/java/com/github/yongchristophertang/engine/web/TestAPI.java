@@ -31,10 +31,7 @@ import java.util.Map;
  */
 @Host(location = "http_config.properties")
 @Path("/v5/categories")
-public interface TestAPI {
-
-    @QueryParam("token")
-    String token = "accepted";
+public interface TestAPI extends BaseParam {
 
     @Path("/grades/${id}")
     @GET
@@ -48,7 +45,7 @@ public interface TestAPI {
     @POST
     @Produce("text/plain")
     @Consume("application/json")
-    RequestBuilder postGrade(@BodyParam String id);
+    RequestBuilder postGrade(@BodyParam("id") String id);
 
     @Path("/test")
     @POST

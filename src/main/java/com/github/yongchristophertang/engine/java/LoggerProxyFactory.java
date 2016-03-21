@@ -16,18 +16,12 @@
 
 package com.github.yongchristophertang.engine.java;
 
-import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Logger proxy factory to inject necessary descriptive logs for calling methods in {@code client}
@@ -66,30 +60,6 @@ public class LoggerProxyFactory<T> implements ProxyFactory<T>, InvocationHandler
      */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        logger.info("API: " + method.getName());
-        List<String> type =
-                Lists.newArrayList(method.getParameterTypes()).stream().map(Class::getSimpleName).collect(
-                        Collectors.toList());
-        IntStream.range(0, type.size())
-                .forEach(i -> logger.info("Input" + (i + 1) + " (" + type.get(i) + "): " + args[i]));
-
-        long bf = System.nanoTime();
-        Object result = method.invoke(client, args);
-        long af = System.nanoTime();
-
-        logger.info("Cost Time(ms): " + (af - bf) / 1000000);
-
-        if (result instanceof Collection && Collection.class.cast(result).size() > 0) {
-            Collection list = Collection.class.cast(result);
-            Iterator iterator = list.iterator();
-            int i = 1;
-            while (iterator.hasNext()) {
-                logger.info(("OUTPUT[" + (i++) + "]: " + iterator.next()));
-            }
-            logger.info("COLLECTION OUTPUT END\n");
-        } else {
-            logger.info("OUTPUT: " + result + "\n");
-        }
-        return result;
+        return LoggerProxyHelper.addLogger(logger, method, args, client);
     }
 }

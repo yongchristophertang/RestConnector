@@ -38,4 +38,8 @@ public class ProxyFactories {
     public static <T> T createLoggerProxy(ProxyFactory<T> factory) {
         return factory.buildProxy();
     }
+
+    public static <T> T createClassLoggerProxy(T client) {
+        return new ClassLoggerProxy<>(client).buildProxy();
+    }
 }
