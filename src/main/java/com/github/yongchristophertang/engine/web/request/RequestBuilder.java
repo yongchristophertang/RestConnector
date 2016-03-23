@@ -18,8 +18,6 @@ package com.github.yongchristophertang.engine.web.request;
 
 import org.apache.http.HttpRequest;
 
-import java.net.URISyntaxException;
-
 /**
  * Factory interface to build {@link org.apache.http.client.methods.HttpUriRequest}.
  *
@@ -28,4 +26,6 @@ import java.net.URISyntaxException;
  */
 public interface RequestBuilder {
     HttpRequest buildRequest() throws Exception;
+
+    String getRequestDescription();
 }

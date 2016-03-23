@@ -52,8 +52,8 @@ public class HttpRequestBuilders implements RequestBuilder {
     private final List<NameValuePair> parameters = new ArrayList<>();
     private final List<NameValuePair> bodyParameters = new ArrayList<>();
     private final List<Cookie> cookies = new ArrayList<>();
-
     private final List<RequestPostProcessor> postProcessors = new ArrayList<>();
+    private String description;
     private HttpRequest httpRequest;
     private String uriTemplate;
     private byte[] bytesContent;
@@ -72,11 +72,12 @@ public class HttpRequestBuilders implements RequestBuilder {
      * @param urlTemplate  a URL template; the resulting URL will be encoded
      * @param urlVariables zero or more URL variables
      */
-    HttpRequestBuilders(HttpRequest httpRequest, String urlTemplate, Object... urlVariables) {
+    HttpRequestBuilders(HttpRequest httpRequest, String urlTemplate, String description, Object... urlVariables) {
 
         Objects.requireNonNull(urlTemplate, "uriTemplate is required");
         Objects.requireNonNull(httpRequest, "httpRequest is required");
 
+        this.description = description;
         this.httpRequest = httpRequest;
         expandURLTemplate(urlTemplate, urlVariables);
         this.uriTemplate = urlTemplate;
@@ -103,6 +104,11 @@ public class HttpRequestBuilders implements RequestBuilder {
             ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new UrlEncodedFormEntity(bodyParameters, "UTF-8"));
         }
         return httpRequest;
+    }
+
+    @Override
+    public String getRequestDescription() {
+        return description;
     }
 
     /**

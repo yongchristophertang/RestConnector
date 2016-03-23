@@ -16,8 +16,8 @@
 
 package com.github.yongchristophertang.engine.web.request;
 
-import com.github.yongchristophertang.engine.web.http.MultipartBodyFormBuilder;
 import com.github.yongchristophertang.engine.web.http.BodyForm;
+import com.github.yongchristophertang.engine.web.http.MultipartBodyFormBuilder;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -44,9 +44,9 @@ public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
      * @param urlTemplate  a URL template; the resulting URL will be encoded
      * @param urlVariables zero or more URL variables
      */
-    HttpMultipartRequestBuilders(HttpRequest httpRequest, String urlTemplate,
+    HttpMultipartRequestBuilders(HttpRequest httpRequest, String urlTemplate, String description,
             Object... urlVariables) {
-        super(httpRequest, urlTemplate, urlVariables);
+        super(httpRequest, urlTemplate, description, urlVariables);
     }
 
     /**

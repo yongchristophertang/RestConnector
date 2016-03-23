@@ -65,7 +65,7 @@ public final class WebTemplate {
         long before = System.currentTimeMillis();
         HttpResponse httpResponse = httpClient.execute(httpRequest);
         long after = System.currentTimeMillis();
-        HttpResult httpResult = new DefaultHttpResult(httpRequest, httpResponse, after - before);
+        HttpResult httpResult = new DefaultHttpResult(httpRequest, httpResponse, after - before, builder.getRequestDescription());
 
         applyDefaultResultMatchersAndHandlers(httpResult);
         return new DefaultResultActions(httpResult);

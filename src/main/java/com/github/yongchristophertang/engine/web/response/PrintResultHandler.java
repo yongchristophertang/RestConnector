@@ -53,7 +53,7 @@ public class PrintResultHandler implements ResultHandler {
     public void handle(HttpResult result) throws Exception {
         RequestLine rl = result.getHttpRequest().getRequestLine();
         String body = null;
-        String formatter = "HTTP Request&Response Log: \n\n \t Request URL: {} \n\n \t ";
+        String formatter = "HTTP Request&Response Log: \n\n \t API: {} \n\n\t Request URL: {} \n\n \t ";
         if (rl.getMethod().equals("POST") || rl.getMethod().equals("PUT") || rl.getMethod().equals("PATCH")) {
             try {
                 body = URLDecoder
@@ -72,7 +72,7 @@ public class PrintResultHandler implements ResultHandler {
                 "\n\n \t " +
                 "Response Content: \n {} \n=======================================================================\n";
 
-        logger.info(formatter, rl, body, Lists.newArrayList(result.getHttpRequest().getAllHeaders()),
+        logger.info(formatter, result.getRequestDescritpion(), rl, body, Lists.newArrayList(result.getHttpRequest().getAllHeaders()),
             result.getCostTime(), result.getHttpResponse().getStatusLine(),
             Lists.newArrayList(result.getHttpResponse().getAllHeaders()),
             getPrettyJsonPrint(result.getResponseStringContent()));

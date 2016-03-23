@@ -102,6 +102,9 @@ public final class RequestProxy implements InvocationHandler {
         url += getPath(method.getDeclaringClass().getAnnotation(Path.class)) +
                 getPath(method.getAnnotation(Path.class));
 
+         /* Fill out the api's description */
+        String description = Optional.ofNullable(method.getAnnotation(Description.class)).map(Description::value).orElse(method.getName());
+
         // Handle Produce and Consume
         String contentType = Optional.ofNullable(method.getAnnotation(Produce.class)).map(Produce::value).orElse(null);
         String accept = Optional.ofNullable(method.getAnnotation(Consume.class)).map(Consume::value).orElse(null);
@@ -394,8 +397,8 @@ public final class RequestProxy implements InvocationHandler {
         }
 
         return fileParams.isEmpty() ?
-                new RequestConstructor(new HttpRequestBuilders(httpMethod.getHttpRequest(), url)).build() :
-                new MultipartConstructor(new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), url)).build();
+                new RequestConstructor(new HttpRequestBuilders(httpMethod.getHttpRequest(), url, description)).build() :
+                new MultipartConstructor(new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), url, description)).build();
     }
 
     private String getHost(Host host) throws Exception {

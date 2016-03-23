@@ -51,4 +51,9 @@ public interface HttpResult {
      * ONCE</strong>.
      */
     String getResponseStringContent() throws IOException;
+
+    /**
+     * Return the description of this request.
+     */
+    String getRequestDescritpion();
 }

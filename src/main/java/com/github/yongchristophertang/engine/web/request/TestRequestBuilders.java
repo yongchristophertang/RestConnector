@@ -40,7 +40,7 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders get(String urlTemplate, Object... urlVariables) {
-        return new HttpRequestBuilders(new HttpGet(), urlTemplate, urlVariables);
+        return new HttpRequestBuilders(new HttpGet(), urlTemplate, "GET Request", urlVariables);
     }
 
     /**
@@ -50,7 +50,7 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders post(String urlTemplate, Object... urlVariables) {
-        return new HttpRequestBuilders(new HttpPost(), urlTemplate, urlVariables);
+        return new HttpRequestBuilders(new HttpPost(), urlTemplate, "POST Request", urlVariables);
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders put(String urlTemplate, Object... urlVariables) {
-        return new HttpRequestBuilders(new HttpPut(), urlTemplate, urlVariables);
+        return new HttpRequestBuilders(new HttpPut(), urlTemplate, "PUT Request", urlVariables);
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders delete(String urlTemplate, Object... urlVariables) {
-        return new HttpRequestBuilders(new HttpDelete(), urlTemplate, urlVariables);
+        return new HttpRequestBuilders(new HttpDelete(), urlTemplate, "DELETE Request", urlVariables);
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders patch(String urlTemplate, Object... urlVariables) {
-        return new HttpRequestBuilders(new HttpPatch(), urlTemplate, urlVariables);
+        return new HttpRequestBuilders(new HttpPatch(), urlTemplate, "PATCH Request", urlVariables);
     }
 
     /**
@@ -91,7 +91,7 @@ public abstract class TestRequestBuilders {
      * @param urlVariables zero or more URL variables
      */
     public static HttpRequestBuilders request(HttpMethod httpMethod, String urlTemplate, Object... urlVariables) {
-        return new HttpRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, urlVariables);
+        return new HttpRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, httpMethod.name(), urlVariables);
     }
 
     /**
@@ -104,7 +104,7 @@ public abstract class TestRequestBuilders {
      */
     public static HttpMultipartRequestBuilders multipartRequest(HttpMethod httpMethod, String urlTemplate,
             Object... urlVariables) {
-        return new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, urlVariables);
+        return new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, httpMethod.name(), urlVariables);
     }
 
     /**

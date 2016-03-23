@@ -34,6 +34,7 @@ public class DefaultHttpResult implements HttpResult {
     private final HttpRequest httpRequest;
     private final HttpResponse httpResponse;
     private final long time;
+    private final String description;
 
     private String response;
 
@@ -41,10 +42,11 @@ public class DefaultHttpResult implements HttpResult {
      * Build an instance of {@link HttpResult} from an {@link org.apache.http
      * .HttpRequest}, an {@link org.apache.http.HttpResponse} and an execution time.
      */
-    public DefaultHttpResult(HttpRequest httpRequest, HttpResponse httpResponse, long time) {
+    public DefaultHttpResult(HttpRequest httpRequest, HttpResponse httpResponse, long time, String description) {
         this.httpRequest = httpRequest;
         this.httpResponse = httpResponse;
         this.time = time;
+        this.description = description;
     }
 
     /**
@@ -54,6 +56,7 @@ public class DefaultHttpResult implements HttpResult {
         this.httpRequest = httpResult.getHttpRequest();
         this.httpResponse = httpResult.getHttpResponse();
         this.time = httpResult.getCostTime();
+        this.description = httpResult.getRequestDescritpion();
     }
 
     /**
@@ -64,6 +67,7 @@ public class DefaultHttpResult implements HttpResult {
         httpRequest = null;
         httpResponse = null;
         time = 0;
+        description = null;
     }
 
     @Override
@@ -91,5 +95,13 @@ public class DefaultHttpResult implements HttpResult {
             response = EntityUtils.toString(httpResponse.getEntity());
         }
         return response;
+    }
+
+    /**
+     * Return the description of this request.
+     */
+    @Override
+    public String getRequestDescritpion() {
+        return description;
     }
 }

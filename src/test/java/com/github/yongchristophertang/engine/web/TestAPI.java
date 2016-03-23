@@ -49,6 +49,7 @@ public interface TestAPI extends BaseParam {
 
     @Path("/test")
     @POST
+    @Description("This is a post API for testing 中文")
     RequestBuilder postTester(@QueryParam("test") String test, @QueryParam("test_list")
         List<String> list, @BodyParam(value = "tester", converter = JsonStringConverter.class) Tester tester, @QueryParam Map<String, String> map);
 
