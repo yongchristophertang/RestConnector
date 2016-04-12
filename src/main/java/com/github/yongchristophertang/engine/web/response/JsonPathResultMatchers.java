@@ -18,7 +18,7 @@ package com.github.yongchristophertang.engine.web.response;
 
 import com.github.yongchristophertang.engine.web.ResultMatcher;
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
+import com.jayway.jsonpath.PathNotFoundException;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 
@@ -36,7 +36,6 @@ import static org.hamcrest.CoreMatchers.*;
  */
 public class JsonPathResultMatchers {
     private final JsonPath jsonPath;
-    private ReadContext context;
 
     /**
      * Access via {@link HttpResultMatchers#jsonPath}
@@ -79,7 +78,12 @@ public class JsonPathResultMatchers {
      */
     public ResultMatcher doesNotExist() {
         return result -> {
-            Object value = jsonPath.read(result.getResponseStringContent());
+            Object value;
+            try {
+                value = jsonPath.read(result.getResponseStringContent());
+            } catch (PathNotFoundException e) {
+                value = null;
+            }
             MatcherAssert.assertThat("Jason Path Not Exists:", value, nullValue());
             if (value instanceof List) {
                 MatcherAssert.assertThat("Jason Path List Not Exists:", ((List<?>) value).isEmpty(), is(true));

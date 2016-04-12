@@ -223,6 +223,9 @@ public final class RequestProxy implements InvocationHandler {
                    } else if (annotationType == HeaderParam.class) {
                        HeaderParam a = parameters[i].getAnnotation(HeaderParam.class);
                        headerParams.put(a.value(), a.converter().newInstance().convert(args[i]));
+                   } else if (annotationType == FileParam.class) {
+                       FileParam a = parameters[i].getAnnotation(FileParam.class);
+                       fileParams.put(a.value(), args[i].toString());
                    }
                }
            }

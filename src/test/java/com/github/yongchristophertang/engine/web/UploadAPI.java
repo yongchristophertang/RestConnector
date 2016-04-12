@@ -16,16 +16,21 @@
 
 package com.github.yongchristophertang.engine.web;
 
-import com.github.yongchristophertang.engine.web.annotations.QueryParam;
+import com.github.yongchristophertang.engine.web.annotations.*;
+import com.github.yongchristophertang.engine.web.request.RequestBuilder;
+
+import java.util.Map;
 
 /**
- * Created by YongTang on 2016/3/16.
+ * Created by YongTang on 2016/4/11.
  *
  * @author Yong Tang
  * @since 0.5
  */
+@Host("test.cystorage.cycore.cn")
+@Path("/v2/files/upload")
+public interface UploadAPI {
 
-public interface BaseParam {
-    @QueryParam("token")
-    String token = "accepted";
+    @POST
+    RequestBuilder uploadFile(@FileParam("file") String filePath, @BodyParam Map<String, Object> params);
 }

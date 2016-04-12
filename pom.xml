@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.yongchristophertang</groupId>
     <artifactId>rest-connector</artifactId>
-    <version>0.5.10</version>
+    <version>0.5.11</version>
     <name>RestConnector</name>
     <description>A test client framework for RESTful HTTP and Java APIs</description>
     <url>https://github.com/yongchristophertang/RestConnector</url>

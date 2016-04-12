@@ -18,10 +18,14 @@ package com.github.yongchristophertang.engine.web.request;
 
 import com.github.yongchristophertang.engine.web.http.BodyForm;
 import com.github.yongchristophertang.engine.web.http.MultipartBodyFormBuilder;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
+
+import java.util.Collection;
+import java.util.Map;
+
+import static com.github.yongchristophertang.engine.AssertUtils.notNull;
 
 /**
  * Multipart builder to build {@link org.apache.http.client.methods.HttpRequestBase}.
@@ -30,7 +34,7 @@ import org.apache.http.client.methods.HttpRequestBase;
  * @since 0.4
  */
 public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
-    private HttpEntity httpEntity;
+    private MultipartBodyFormBuilder bodyBuilder = null;
 
     /**
      * Package private constructor. To get an instance, use static factory
@@ -40,12 +44,12 @@ public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
      * the {@code MockHttpServletRequest} can be plugged in via
      * {@link #with(RequestPostProcessor)}.
      *
-     * @param httpRequest an HttpRequest object
+     * @param httpRequest  an HttpRequest object
      * @param urlTemplate  a URL template; the resulting URL will be encoded
      * @param urlVariables zero or more URL variables
      */
     HttpMultipartRequestBuilders(HttpRequest httpRequest, String urlTemplate, String description,
-            Object... urlVariables) {
+        Object... urlVariables) {
         super(httpRequest, urlTemplate, description, urlVariables);
     }
 
@@ -55,7 +59,7 @@ public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
     @Override
     public HttpRequestBase buildRequest() throws Exception {
         HttpEntityEnclosingRequestBase requestBase = (HttpEntityEnclosingRequestBase) super.buildRequest();
-        requestBase.setEntity(httpEntity);
+        requestBase.setEntity(this.bodyBuilder.buildBody().getHttpEntity());
         return requestBase;
     }
 
@@ -65,8 +69,73 @@ public class HttpMultipartRequestBuilders extends HttpRequestBuilders {
      * @param multipartBodyFormBuilder factory builder for {@link BodyForm}
      */
     public HttpRequestBuilders body(MultipartBodyFormBuilder multipartBodyFormBuilder) {
-        this.httpEntity = multipartBodyFormBuilder.buildBody().getHttpEntity();
+        this.bodyBuilder = multipartBodyFormBuilder;
         return this;
     }
 
+    /**
+     * Set the uploaded file
+     *
+     * @param name     updated file name
+     * @param filePath local file path
+     */
+    public HttpMultipartRequestBuilders file(String name, String filePath) {
+        if (bodyBuilder == null) {
+            bodyBuilder = MultipartBodyFormBuilder.create();
+        }
+
+        bodyBuilder.file(name, filePath);
+        return this;
+    }
+
+    /**
+     * Set multipart body parameters
+     *
+     * @param param parameter name
+     * @param values parameter values
+     */
+    public HttpMultipartRequestBuilders body(String param, Collection<String> values) {
+        notNull(param, "Parameter must not be null");
+
+        if (bodyBuilder == null) {
+            bodyBuilder = MultipartBodyFormBuilder.create();
+        }
+
+        bodyBuilder.param(param, values);
+        return this;
+    }
+
+    /**
+     * Set multipart body parameter
+     *
+     * @param param the body form parameter
+     * @param value the parameter value
+     */
+    public HttpMultipartRequestBuilders body(String param, String value) {
+        notNull(param, "Parameter must not be null");
+
+        if (bodyBuilder == null) {
+            bodyBuilder = MultipartBodyFormBuilder.create();
+        }
+
+        bodyBuilder.param(param, value);
+        return this;
+    }
+
+    /**
+     * Set multipart body parameters
+     *
+     * @param params parameters in {@See Map}
+     * @return
+     */
+    public HttpMultipartRequestBuilders body(Map<String, Object> params) {
+        notNull(params, "Parameters must not be null");
+
+        if (bodyBuilder == null) {
+            bodyBuilder = MultipartBodyFormBuilder.create();
+        }
+
+        params.entrySet().forEach(e -> bodyBuilder.param(e.getKey(), e.getValue().toString()));
+        return this;
+    }
 }

@@ -107,6 +107,10 @@ public abstract class TestRequestBuilders {
         return new HttpMultipartRequestBuilders(httpMethod.getHttpRequest(), urlTemplate, httpMethod.name(), urlVariables);
     }
 
+    public static HttpMultipartRequestBuilders uploadFile(String urlTemplate, Object... urlVariables) {
+        return new HttpMultipartRequestBuilders(new HttpPost(), urlTemplate, "POST Request with file", urlVariables);
+    }
+
     /**
      * Create a {@code T} instance which is a proxy for the interface {@code clientIface}. Typically methods in
      * {@code clientIface} will return a {@link com.github.yongchristophertang.engine.web.request.RequestBuilder} or, more

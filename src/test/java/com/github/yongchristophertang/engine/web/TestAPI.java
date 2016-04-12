@@ -17,6 +17,7 @@
 package com.github.yongchristophertang.engine.web;
 
 import com.github.yongchristophertang.engine.web.annotations.*;
+import com.github.yongchristophertang.engine.web.request.HttpRequestBuilders;
 import com.github.yongchristophertang.engine.web.request.JsonStringConverter;
 import com.github.yongchristophertang.engine.web.request.RequestBuilder;
 
@@ -64,4 +65,8 @@ public interface TestAPI extends BaseParam {
     @Path("/files")
     @POST
     RequestBuilder uploadFile(@BodyParam("test") String test, @FileParam("file") String filePath);
+
+    @POST
+    @Path("/octet")
+    HttpRequestBuilders inputBinStream();
 }

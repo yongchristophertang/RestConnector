@@ -28,8 +28,9 @@ import java.util.Properties;
  * Created by YongTang on 2015/6/2.
  *
  * @author Yong Tang
- * @since 1.0
+ * @since 1.00
  */
+//TODO: To be removed in the future
 public abstract class PropertyHandler {
 
     public static void loadProperties(Class<?> testClass, Object[] testInstances) {

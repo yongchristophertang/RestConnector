@@ -58,6 +58,32 @@ public class GetTest {
         Map<String, String> queries = new HashMap<>();
         queries.put("add1", "value1");
         queries.put("add2", "value2");
-        webTemplate.perform(TestRequestBuilders.api(TestAPI.class).postTester("", Arrays.asList("1", "2", "3"), null, queries)).andDo(print());
+        webTemplate
+            .perform(TestRequestBuilders.api(TestAPI.class).postTester("", Arrays.asList("1", "2", "3"), null, queries))
+            .andDo(print());
+    }
+
+    @Test
+    public void testDemo4() throws Exception {
+        webTemplate.perform(TestRequestBuilders.api(TestAPI.class).inputBinStream().body(new byte[]{}));
+    }
+
+    @Test
+    public void testDemo5() throws Exception {
+        webTemplate.perform(TestRequestBuilders.uploadFile("http://test.cystorage.cycore.cn/v2/files/upload")
+            .body("module", "panFilePrepareAdd").body("expires", "1460362301483").body("token", "q1AhfhihxKMtMAk40eQdwI6jCm4=")
+            .body("userId", "2000000017000005331").body("action", "add").body("appKey", "rrt_ewp").file("file", "test-resource/test.txt")).andDo(print());
+    }
+
+    @Test
+    public void testDemo6() throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("module", "panFilePrepareAdd");
+        params.put("expires", "1460366029660");
+        params.put("token", "CuePqlgUacv4sqtsqgcYUGjSc7U=");
+        params.put("userId", "2000000017000005331");
+        params.put("action", "add");
+        params.put("appKey", "rrt_ewp");
+        webTemplate.perform(TestRequestBuilders.api(UploadAPI.class).uploadFile("test-resource/test.txt", params)).andDo(print());
     }
 }
