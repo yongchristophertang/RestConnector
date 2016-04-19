@@ -36,5 +36,8 @@ public class JavaTest {
     public void testDemo2() {
         TestClassClient proxy = ProxyFactories.createClassLoggerProxy(new TestClassClient("oops,"));
         proxy.testAPI("cool");
+        System.out.println(proxy);
+
+        proxy.testObject("cool");
     }
 }

@@ -31,4 +31,8 @@ public class TestClassClient {
     public String testAPI(String cool) {
         return init + cool;
     }
+
+    public DemoObject testObject(String test) {
+        return new DemoObject(111, test, 1.345);
+    }
 }

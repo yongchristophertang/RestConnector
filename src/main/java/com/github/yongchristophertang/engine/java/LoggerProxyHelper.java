@@ -16,8 +16,11 @@
 
 package com.github.yongchristophertang.engine.java;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 
@@ -29,44 +32,98 @@ import java.util.Iterator;
  */
 class LoggerProxyHelper {
     static Object addLogger(Logger logger, Method method, Object[] args, Object client) throws Throwable {
+        if (method.getDeclaringClass() == Object.class) {
+            return method.invoke(client, args);
+        }
+
         String formatter = "\n\tAPI: " + method.getName() + "\n\n";
         formatter += "\tInput:\n";
         for (int i = 0; i < method.getParameterCount(); i++) {
             formatter += "\t\t" + method.getParameters()[i].getName() + " (" +
                 method.getParameters()[i].getType().getSimpleName() + "): ";
-            if (args[i] instanceof Iterable) {
+            if (args[i] == null) {
+                formatter += "NULL";
+            } else if (args[i] instanceof Iterable) {
                 int cnt = 0;
                 Iterator iter = ((Iterable) args[i]).iterator();
                 while (iter.hasNext()) {
-                    formatter += "\n\t\t\t[" + (++cnt) + "]: " + iter.next();
+                    formatter += "\n\t\t\t[" + (++cnt) + "]: " + toRawString(iter.next());
                 }
             } else {
-                formatter += args[i];
+                formatter += toRawString(args[i]);
             }
             formatter += "\n";
         }
 
         long bf = System.nanoTime();
-        Object result = method.invoke(client, args);
+        Object result;
+        try {
+            result = method.invoke(client, args);
+        } catch (InvocationTargetException e) {
+            formatter += "\n\tException: \n\t\t" + e.getTargetException();
+            formatter += "\n=======================================================================\n";
+            logger.info(formatter);
+            throw e.getTargetException();
+        }
         long af = System.nanoTime();
 
         formatter += "\n\tResponse Time(ms): " + (af - bf) / 1000000 + "\n\n\tOutput:\n";
 
-        if (result instanceof Iterable) {
+        if (result == null) {
+            formatter += "\t\tNULL\n";
+        } else if (result instanceof Iterable) {
             Iterator iter = ((Iterable) result).iterator();
             int cnt = 0;
             while (iter.hasNext()) {
-                formatter += "\t\t[" + (++cnt) + "]: " + iter.next() + "\n";
+                formatter += "\t\t[" + (++cnt) + "]: " + toPrinterString(iter.next()) + "\n";
             }
             if (cnt == 0) {
-                formatter += "\t\tEmpty Collection\n";
+                formatter += "\t\tEmpty Collection []\n";
             }
         } else {
-            formatter += "\t\t" + result + "\n";
+            formatter += "\t\t" + toPrinterString(result) + "\n";
         }
 
         formatter += "=======================================================================\n";
         logger.info(formatter);
         return result;
+    }
+
+    private static String toPrinterString(Object obj) {
+        if (hasOfficialString(obj)) {
+            return obj.toString();
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return obj.getClass().getSimpleName() + ": " + mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            return "The object has not implemented toString() method and cannot be serialized to a string either";
+        }
+    }
+
+    private static String toRawString(Object obj) {
+        if (hasOfficialString(obj)) {
+            return obj.toString();
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return obj.getClass().getSimpleName() + ": " + mapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            return "The object has not implemented toString() method and cannot be serialized to a string either";
+        }
+    }
+
+    private static boolean hasOfficialString(Object obj) {
+        boolean hasToString;
+        try {
+            obj.getClass().getDeclaredMethod("toString");
+            hasToString = true;
+        } catch (NoSuchMethodException e) {
+            hasToString = false;
+        }
+
+        return hasToString;
     }
 }

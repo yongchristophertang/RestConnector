@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.yongchristophertang</groupId>
     <artifactId>rest-connector</artifactId>
-    <version>0.5.11</version>
+    <version>0.5.15</version>
     <name>RestConnector</name>
     <description>A test client framework for RESTful HTTP and Java APIs</description>
     <url>https://github.com/yongchristophertang/RestConnector</url>
@@ -42,7 +42,7 @@
         <mysql.driver.version>5.1.26</mysql.driver.version>
         <mongo.driver.version>2.11.4</mongo.driver.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <guice.version>3.0</guice.version>
+        <guice.version>4.0</guice.version>
         <javaslang.version>2.0.0-RC2</javaslang.version>
         <commons.lang3.version>3.3.2</commons.lang3.version>
         <hikari.version>2.4.2</hikari.version>

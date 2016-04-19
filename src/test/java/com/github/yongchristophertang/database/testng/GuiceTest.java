@@ -33,7 +33,7 @@ import java.sql.SQLException;
 @Test
 //@SqlDB(url = "111", userName = "222", password = "333")
 //@SqlDB(url = "333", userName = "222", password = "333")
-@SqlDB(url = "jdbc:sqlserver://172.16.79.25:1433;databaseName=usp_center_iflybook_test", userName = "sa", password = "Iflysql@server123")
+@SqlDB(url = "jdbc:mysql://192.168.57.51:3306/elp_user_test", userName = "root", password = "123456")
 public class GuiceTest extends AbstractGuiceTest {
 //    @Inject
 //    private Provider<JdbcTemplate> jdbcTemplateProvider;
