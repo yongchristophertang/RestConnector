@@ -18,6 +18,9 @@ package com.github.yongchristophertang.engine.java;
 
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by YongTang on 2015/3/18.
  *
@@ -39,5 +42,8 @@ public class JavaTest {
         System.out.println(proxy);
 
         proxy.testObject("cool");
+        Map<String, String> map = new HashMap<>();
+        map.put("1", "ddd");
+        proxy.testMap(map);
     }
 }

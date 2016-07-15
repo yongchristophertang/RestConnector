@@ -19,11 +19,13 @@ package com.github.yongchristophertang.database.guice;
 import com.github.yongchristophertang.database.annotations.Mongo;
 import com.github.yongchristophertang.database.guice.provider.ClientFactory;
 import com.github.yongchristophertang.database.guice.provider.MongoFactory;
+import com.github.yongchristophertang.database.guice.provider.MongoTemplateFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.mongodb.MongoClient;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
  * Builder to create a module which can provide {@link com.mongodb.MongoClient} injection
@@ -45,12 +47,21 @@ public class MongoModuleBuilder extends DBAnnotationModuleBuilder {
         return new AbstractModule() {
             @Override
             protected void configure() {
+                Mongo[] mongos = getAnnotations(null, clazz, Mongo.class);
+
                 bind(new TypeLiteral<ClientFactory<MongoClient>>() {
-                }).toInstance(new MongoFactory(getAnnotations(null, clazz, Mongo.class)));
+                }).toInstance(new MongoFactory(mongos));
+                bind(new TypeLiteral<ClientFactory<MongoTemplate>>() {
+                }).toInstance(new MongoTemplateFactory(mongos));
             }
 
             @Provides
-            MongoClient provideMongoTemplate(ClientFactory<MongoClient> factory) {
+            MongoClient provideMongoClient(ClientFactory<MongoClient> factory) {
+                return factory.buildClients().poll();
+            }
+
+            @Provides
+            MongoTemplate provideMongoTemplate(ClientFactory<MongoTemplate> factory) {
                 return factory.buildClients().poll();
             }
         };

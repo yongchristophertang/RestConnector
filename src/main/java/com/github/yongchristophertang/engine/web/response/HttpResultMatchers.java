@@ -19,6 +19,9 @@ package com.github.yongchristophertang.engine.web.response;
 import com.github.yongchristophertang.engine.web.ResultMatcher;
 import org.hamcrest.Matcher;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+
 import static org.hamcrest.CoreMatchers.is;
 
 /**
@@ -56,6 +59,11 @@ public abstract class HttpResultMatchers {
      */
     public static <T> ResultMatcher jsonPath(String expression, T expected) {
         return jsonPath(expression, is(expected));
+    }
+
+    public static ResultMatcher xPath(String expression, String expected)
+        throws XPathExpressionException, ParserConfigurationException {
+        return new XPathResultMatcher(expression).value(expected);
     }
 
     /**

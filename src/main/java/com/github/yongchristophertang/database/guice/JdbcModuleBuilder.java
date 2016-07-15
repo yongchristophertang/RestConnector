@@ -19,10 +19,12 @@ package com.github.yongchristophertang.database.guice;
 import com.github.yongchristophertang.database.annotations.SqlDB;
 import com.github.yongchristophertang.database.guice.provider.ClientFactory;
 import com.github.yongchristophertang.database.guice.provider.DataSourceFactory;
+import com.github.yongchristophertang.database.guice.provider.JdbcTemplateFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -44,12 +46,21 @@ public class JdbcModuleBuilder extends DBAnnotationModuleBuilder {
         return new AbstractModule() {
             @Override
             protected void configure() {
+                SqlDB[] sql = getAnnotations(null, clazz, SqlDB.class);
+
                 bind(new TypeLiteral<ClientFactory<DataSource>>() {
-                }).toInstance(new DataSourceFactory(getAnnotations(null, clazz, SqlDB.class)));
+                }).toInstance(new DataSourceFactory(sql));
+                bind(new TypeLiteral<ClientFactory<JdbcTemplate>>() {
+                }).toInstance(new JdbcTemplateFactory(sql));
             }
 
             @Provides
             DataSource provideJdbcDataSource(ClientFactory<DataSource> factory) {
+                return factory.buildClients().poll();
+            }
+
+            @Provides
+            JdbcTemplate provideJdbcTemplate(ClientFactory<JdbcTemplate> factory) {
                 return factory.buildClients().poll();
             }
         };

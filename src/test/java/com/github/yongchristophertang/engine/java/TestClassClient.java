@@ -16,6 +16,8 @@
 
 package com.github.yongchristophertang.engine.java;
 
+import java.util.Map;
+
 /**
  * Created by YongTang on 2016/3/9.
  *
@@ -34,5 +36,9 @@ public class TestClassClient {
 
     public DemoObject testObject(String test) {
         return new DemoObject(111, test, 1.345);
+    }
+
+    public DemoObject testMap(Map<String, String> map) {
+        return new DemoObject(111, map.get("1"), 1.2);
     }
 }

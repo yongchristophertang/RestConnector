@@ -50,10 +50,31 @@ public class ClassLoggerProxy<T> implements MethodInterceptor, ProxyFactory<T> {
     @Override
     @SuppressWarnings("unchecked")
     public T buildProxy() {
+        Constructor<?> constructor = client.getClass().getConstructors()[0];
+        return buildProxy(new Object[constructor.getParameterCount()]);
+    }
+
+    /**
+     * Build a proxy with constructor arguments {@code args}.
+     * This method is used to fix the null pointer exception for constructor arguments
+     *
+     * @param args constructor arguments
+     */
+    @SuppressWarnings("unchecked")
+    public T buildProxy(Object[] args) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(client.getClass());
         enhancer.setCallback(this);
-        Constructor<?> constructor = client.getClass().getConstructors()[0];
-        return (T) enhancer.create(constructor.getParameterTypes(), new Object[constructor.getParameterCount()]);
+        Class<?>[] classes = new Class<?>[args.length];
+        for (int i = 0; i < args.length; i++) {
+            classes[i] = args[i].getClass();
+        }
+        try {
+            Constructor<?> constructor = client.getClass().getConstructor(classes);
+            return (T) enhancer.create(constructor.getParameterTypes(), args);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

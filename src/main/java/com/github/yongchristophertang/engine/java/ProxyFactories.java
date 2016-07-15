@@ -42,4 +42,8 @@ public class ProxyFactories {
     public static <T> T createClassLoggerProxy(T client) {
         return new ClassLoggerProxy<>(client).buildProxy();
     }
+
+    public static <T> T createClassLoggerProxy(T client, Object[] args) {
+        return new ClassLoggerProxy<>(client).buildProxy(args);
+    }
 }

@@ -18,6 +18,7 @@ package com.github.yongchristophertang.database.testng;
 
 import com.github.yongchristophertang.database.annotations.SqlDB;
 import com.google.inject.Inject;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Guice;
 
@@ -37,6 +38,9 @@ public abstract class AbstractGuiceTest {
 //    public String httpHost;
     @Inject
     protected DataSource dataSource0;
+
+    @Inject
+    protected JdbcTemplate jdbcTemplate;
 
     @BeforeClass
     public void setUp0() {

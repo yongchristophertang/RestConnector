@@ -67,6 +67,9 @@ public class GuiceTest extends AbstractGuiceTest {
     @Test
     private void testDemo2() {
         System.out.println(dataSource);
+
+        System.out.println(jdbcTemplate);
+
 //        System.out.println(dataSource2);
     }
 

@@ -47,10 +47,10 @@ class LoggerProxyHelper {
                 int cnt = 0;
                 Iterator iter = ((Iterable) args[i]).iterator();
                 while (iter.hasNext()) {
-                    formatter += "\n\t\t\t[" + (++cnt) + "]: " + toRawString(iter.next());
+                    formatter += "\n\t\t\t[" + (++cnt) + "]: " + toPrinterString(iter.next(), false);
                 }
             } else {
-                formatter += toRawString(args[i]);
+                formatter += toPrinterString(args[i], false);
             }
             formatter += "\n";
         }
@@ -75,13 +75,13 @@ class LoggerProxyHelper {
             Iterator iter = ((Iterable) result).iterator();
             int cnt = 0;
             while (iter.hasNext()) {
-                formatter += "\t\t[" + (++cnt) + "]: " + toPrinterString(iter.next()) + "\n";
+                formatter += "\t\t[" + (++cnt) + "]: " + toPrinterString(iter.next(), true) + "\n";
             }
             if (cnt == 0) {
                 formatter += "\t\tEmpty Collection []\n";
             }
         } else {
-            formatter += "\t\t" + toPrinterString(result) + "\n";
+            formatter += "\t\t" + toPrinterString(result, true) + "\n";
         }
 
         formatter += "=======================================================================\n";
@@ -89,41 +89,22 @@ class LoggerProxyHelper {
         return result;
     }
 
-    private static String toPrinterString(Object obj) {
-        if (hasOfficialString(obj)) {
+    private static String toPrinterString(Object obj, boolean pretty) {
+        /*
+         * returns true if an object can be converted to a string which matches the regex pattern of ^([a-z]+\.)+[a-zA-Z]+@\w+$ that is
+         * the official default object toString implementation
+         */
+        if (!obj.toString().matches("^([a-z]+\\.)+[a-zA-Z]+@\\w+$")) {
             return obj.toString();
         }
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return obj.getClass().getSimpleName() + ": " + mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+            return obj.getClass().getSimpleName() + ": " +
+                (pretty ? mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj) :
+                    mapper.writeValueAsString(obj));
         } catch (JsonProcessingException e) {
             return "The object has not implemented toString() method and cannot be serialized to a string either";
         }
-    }
-
-    private static String toRawString(Object obj) {
-        if (hasOfficialString(obj)) {
-            return obj.toString();
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return obj.getClass().getSimpleName() + ": " + mapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            return "The object has not implemented toString() method and cannot be serialized to a string either";
-        }
-    }
-
-    private static boolean hasOfficialString(Object obj) {
-        boolean hasToString;
-        try {
-            obj.getClass().getDeclaredMethod("toString");
-            hasToString = true;
-        } catch (NoSuchMethodException e) {
-            hasToString = false;
-        }
-
-        return hasToString;
     }
 }
